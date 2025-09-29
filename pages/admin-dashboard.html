@@ -1,1 +1,121 @@
-# Admin dashboard
+<!-- # Admin dashboard -->
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard - MedExam System</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <!-- ======= Header ======= -->
+  <header>
+    <div class="container">
+      <h1 class="logo">MedExam<span>System</span></h1>
+      <nav>
+        <ul>
+          <li><a href="admin-dashboard.html" class="active">Dashboard</a></li>
+          <li><a href="#" id="logoutBtn">Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ======= Dashboard Layout ======= -->
+  <section class="dashboard">
+    <aside class="sidebar">
+      <h2>Admin Menu</h2>
+      <ul>
+        <li><a href="#" data-section="overview">📊 Overview</a></li>
+        <li><a href="#" data-section="questions">📝 Manage Questions</a></li>
+        <li><a href="#" data-section="schedule">📅 Schedule Exam</a></li>
+        <li><a href="#" data-section="students">👩‍🎓 Student Activity</a></li>
+        <li><a href="#" data-section="results">📈 Results</a></li>
+        <li><a href="#" data-section="proctor">🔒 Proctoring Logs</a></li>
+
+      </ul>
+    </aside>
+
+    <main class="content">
+      <!-- Default view -->
+      <section id="overview" class="section active">
+        <h2>Welcome, Admin 👩‍⚕️</h2>
+        <p>Here you can manage exams, create questions, and monitor student performance.</p>
+      </section>
+
+      <!-- Question Management -->
+      <section id="questions" class="section">
+        <h2>📝 Manage Questions</h2>
+        <form id="questionForm">
+          <input type="text" id="question" placeholder="Enter question" required />
+          <input type="text" id="optionA" placeholder="Option A" required />
+          <input type="text" id="optionB" placeholder="Option B" required />
+          <input type="text" id="optionC" placeholder="Option C" required />
+          <input type="text" id="optionD" placeholder="Option D" required />
+          <select id="correctAnswer" required>
+            <option value="">Select Correct Answer</option>
+            <option value="A">Option A</option>
+            <option value="B">Option B</option>
+            <option value="C">Option C</option>
+            <option value="D">Option D</option>
+          </select>
+          <button type="submit" class="btn primary">Add Question</button>
+        </form>
+
+        <h3>📚 Question List</h3>
+        <ul id="questionList"></ul>
+      </section>
+
+      <!-- Exam Scheduling -->
+      <section id="schedule" class="section">
+        <h2>📅 Schedule Exam</h2>
+        <form id="scheduleForm">
+          <input type="text" id="examTitle" placeholder="Exam Title" required />
+          <input type="datetime-local" id="startDate" required />
+          <input type="datetime-local" id="endDate" required />
+          <button type="submit" class="btn primary">Schedule Exam</button>
+        </form>
+
+        <h3>🗓️ Scheduled Exams</h3>
+        <ul id="examList"></ul>
+      </section>
+
+      <!-- Students & Results (placeholders for now) -->
+      <section id="students" class="section">
+        <h2>👩‍🎓 Student Activity</h2>
+        <p>Monitor student login, attempts, and proctoring logs (Coming Soon).</p>
+      </section>
+
+      <section id="results" class="section">
+        <h2>📈 Results</h2>
+        <p>View exam performance analytics (Coming Soon).</p>
+      </section>
+<!-- Proctor Logs Section -->
+<section id="proctor" class="section">
+  <h2>📸 Proctoring Logs</h2>
+
+  <div class="proctor-controls">
+    <input type="text" id="proctorFilterEmail" placeholder="Filter by student email" />
+    <input type="text" id="proctorFilterExam" placeholder="Filter by exam title" />
+    <button id="proctorRefresh" class="btn secondary">Refresh</button>
+    <button id="clearProctorLogs" class="btn" style="background:#e63946;color:#fff;">Clear Logs</button>
+  </div>
+
+  <ul id="proctorList"></ul>
+</section>
+
+<!-- Modal for viewing snapshot -->
+<div id="proctorModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span id="modalClose" class="modal-close">&times;</span>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+
+    </main>
+  </section>
+
+  <script src="../js/admin.js"></script>
+</body>
+</html>

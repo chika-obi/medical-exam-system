@@ -1,1 +1,59 @@
-# Exam interface
+<!-- # Exam interface -->
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Exam - MedExam System</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <!-- ======= Header ======= -->
+  <header>
+    <div class="container">
+      <h1 class="logo">MedExam<span>System</span></h1>
+      <nav>
+        <ul>
+          <li><a href="#" id="exitExam">Exit</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ======= Exam Section ======= -->
+  <section class="exam-container">
+    <div class="exam-header">
+      <h2 id="examTitle">Exam Title</h2>
+      <div class="exam-info">
+        <p>Time Left: <span id="timer">--:--</span></p>
+        <p>Question <span id="currentQuestionNumber">1</span> / <span id="totalQuestions">0</span></p>
+      </div>
+      <div class="progress-bar">
+        <div id="progress" class="progress"></div>
+      </div>
+    </div>
+
+    <div class="question-box" id="questionBox"></div>
+
+    <div class="exam-buttons">
+      <button id="prevBtn" class="btn secondary">Previous</button>
+      <button id="nextBtn" class="btn primary">Next</button>
+      <button id="submitBtn" class="btn primary" style="display: none;">Submit Exam</button>
+    </div>
+  </section>
+
+  <script src="../js/exam.js"></script>
+  <script src="../js/security.js"></script>
+ <script src="../js/proctor.js"></script>
+<script>
+  // start proctoring at exam load
+  if (typeof __proctorStart === "function") {
+    __proctorStart();
+  }
+  // stop proctoring when exam is submitted in exam.js it calls calculateScore()
+  // ensure exam.js calls __proctorStop() before final submit redirect:
+  // e.g., in calculateScore() call window.__proctorStop();
+</script>
+
+</body>
+</html>

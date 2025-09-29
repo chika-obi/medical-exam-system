@@ -1,1 +1,58 @@
- # Student dashboard
+ <!-- # Student dashboard -->
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Dashboard - MedExam System</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <!-- ======= Header ======= -->
+  <header>
+    <div class="container">
+      <h1 class="logo">MedExam<span>System</span></h1>
+      <nav>
+        <ul>
+          <li><a href="student-dashboard.html" class="active">Dashboard</a></li>
+          <li><a href="#" id="logoutBtn">Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ======= Dashboard Layout ======= -->
+  <section class="dashboard">
+    <aside class="sidebar">
+      <h2>Student Menu</h2>
+      <ul>
+        <li><a href="#" data-section="profile">👤 Profile</a></li>
+        <li><a href="#" data-section="exams">📅 Available Exams</a></li>
+        <li><a href="#" data-section="history">📊 Exam History</a></li>
+      </ul>
+    </aside>
+
+    <main class="content">
+      <!-- Profile Section -->
+      <section id="profile" class="section active">
+        <h2>👤 My Profile</h2>
+        <div id="studentProfile"></div>
+      </section>
+
+      <!-- Available Exams -->
+      <section id="exams" class="section">
+        <h2>📅 Available Exams</h2>
+        <ul id="availableExams"></ul>
+      </section>
+
+      <!-- Exam History -->
+      <section id="history" class="section">
+        <h2>📊 Exam History</h2>
+        <ul id="examHistory"></ul>
+      </section>
+    </main>
+  </section>
+
+  <script src="../js/student.js"></script>
+</body>
+</html>
