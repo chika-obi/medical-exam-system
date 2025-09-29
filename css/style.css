@@ -134,3 +134,57 @@ footer {
   font-size: 0.9rem;
   margin-top: 40px;
 }
+
+/* ==== Authentication Pages ==== */
+.auth-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 85vh;
+  background: #f1faff;
+}
+
+.auth-box {
+  background: #fff;
+  padding: 40px 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.auth-box h2 {
+  margin-bottom: 20px;
+  color: #002b5b;
+}
+
+.auth-box form input,
+.auth-box form select {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.auth-box form button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #0077b6;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.auth-box form button:hover {
+  opacity: 0.9;
+}
+
+.auth-box p {
+  margin-top: 10px;
+}
+
