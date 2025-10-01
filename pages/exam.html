@@ -1,59 +1,149 @@
-<!-- # Exam interface -->
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Exam - MedExam System</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Exam | Medical Exam System</title>
   <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    /* exam page specific styles (keeps it modern & focused) */
+    body { background:#f4f7fb; font-family: "Segoe UI", Tahoma, sans-serif; color:#222; }
+    header { background:#fff; border-bottom:1px solid #e6eef9; padding:12px 24px; display:flex; justify-content:space-between; align-items:center; }
+    header .logo { font-weight:700; color:#0d47a1; }
+    .exam-wrap { width:90%; max-width:980px; margin:28px auto; }
+    .exam-top { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px; }
+    .exam-top .info { font-size:0.95rem; color:#444; }
+    .timer { background:#0d47a1; color:#fff; padding:10px 16px; border-radius:8px; font-weight:700; }
+    .progress-bar { height:10px; background:#e9f2ff; border-radius:6px; overflow:hidden; margin:14px 0; }
+    .progress { height:100%; width:0%; background:#00b4d8; transition:width .35s ease; }
+
+    .question-card { background:#fff; padding:22px; border-radius:12px; box-shadow:0 8px 24px rgba(13,71,161,0.06); }
+    .question-card h3 { margin-bottom:8px; color:#0d47a1; }
+    .question-text { font-size:1rem; margin-bottom:14px; color:#222; }
+
+    .options label { display:block; padding:12px; background:#fbfdff; border-radius:8px; margin-bottom:10px; cursor:pointer; border:1px solid #eaf5ff; transition:all .18s; }
+    .options input[type="radio"]{ margin-right:10px; }
+    .options label:hover { transform:translateY(-2px); box-shadow:0 6px 18px rgba(13,71,161,0.06); }
+
+    .nav-actions { display:flex; justify-content:space-between; gap:10px; margin-top:18px; }
+    .btn { padding:10px 18px; border-radius:8px; border:none; cursor:pointer; font-weight:600; }
+    .btn.primary { background:#0d47a1; color:#fff; }
+    .btn.secondary { background:#fff; color:#0d47a1; border:1px solid #cfe2ff; }
+    .btn.ghost { background:transparent; color:#666; border:1px solid #eee; }
+
+    .result-wrap { background:#fff; padding:22px; border-radius:12px; box-shadow:0 8px 24px rgba(13,71,161,0.06); }
+    .result-summary { display:flex; gap:18px; align-items:center; margin-bottom:18px; }
+    .result-summary .big { font-size:2.6rem; color:#0d47a1; font-weight:800; }
+    .review-item { border-top:1px dashed #eef6ff; padding:12px 0; }
+    .review-item h4 { margin-bottom:8px; color:#0d47a1; }
+    .correct { color: #1b7a3a; font-weight:700; }
+    .wrong { color: #d62828; font-weight:700; }
+    .small-meta { font-size:0.85rem; color:#666; }
+
+    /* center consent if it's present */
+    .consent-modal, .policy-modal { z-index:99999; }
+  </style>
 </head>
 <body>
-  <!-- ======= Header ======= -->
   <header>
-    <div class="container">
-      <h1 class="logo">MedExam<span>System</span></h1>
-      <nav>
-        <ul>
-          <li><a href="#" id="exitExam">Exit</a></li>
-        </ul>
-      </nav>
+    <div class="logo">MedExam<span>System</span></div>
+    <div>
+      <span id="studentShort" class="small-meta"></span>
+      <a id="exitExam" class="btn ghost" style="margin-left:10px">Exit Exam</a>
     </div>
   </header>
 
-  <!-- ======= Exam Section ======= -->
-  <section class="exam-container">
-    <div class="exam-header">
-      <h2 id="examTitle">Exam Title</h2>
-      <div class="exam-info">
-        <p>Time Left: <span id="timer">--:--</span></p>
-        <p>Question <span id="currentQuestionNumber">1</span> / <span id="totalQuestions">0</span></p>
+  <!-- ====== Consent modal (inserted here so it's top-of-body) ======
+       If you already have consent modal elsewhere, ensure IDs match:
+       #consentModal, #consentCheckbox, #startExamBtn, #viewPolicyBtn, #policyModal, #closePolicy
+  -->
+  <!-- ================= EXAM CONSENT MODAL ================= -->
+  <div id="consentModal" class="consent-modal" style="display:flex;">
+    <div class="consent-content">
+      <h2>📜 Exam Monitoring Consent</h2>
+      <p>Please review and accept the following terms before starting the exam:</p>
+      <ul>
+        <li>📸 Your webcam will capture periodic snapshots for identity verification and monitoring.</li>
+        <li>🔐 Tab switching, copying/pasting, right-clicking, or opening developer tools will be logged.</li>
+        <li>📂 Data is used only for academic integrity and will be deleted after review.</li>
+      </ul>
+      <label class="consent-check">
+        <input type="checkbox" id="consentCheckbox" />
+        I have read and agree to the Exam Monitoring Policy.
+      </label>
+      <div class="consent-buttons" style="display:flex;gap:10px;justify-content:flex-end;">
+        <button id="viewPolicyBtn" class="btn secondary">📑 View Full Policy</button>
+        <button id="startExamBtn" class="btn primary" disabled>✅ I Agree & Start Exam</button>
       </div>
-      <div class="progress-bar">
-        <div id="progress" class="progress"></div>
+    </div>
+  </div>
+
+  <!-- ================= FULL POLICY MODAL ================= -->
+  <div id="policyModal" class="policy-modal" style="display:none;">
+    <div class="policy-content">
+      <span id="closePolicy" class="close">&times;</span>
+      <h2>Exam Monitoring Policy</h2>
+      <p>This exam uses proctoring to protect integrity. The following may be collected:</p>
+      <ul>
+        <li>📷 Periodic webcam snapshots</li>
+        <li>🧭 Browser visibility events (tab switches, blur/focus)</li>
+        <li>⌨️ Developer tools attempts, copy/paste, right-click events</li>
+      </ul>
+      <p>Data will be retained only for evaluation and deleted after investigation. By continuing you consent to this monitoring.</p>
+    </div>
+  </div>
+
+  <!-- ====== MAIN EXAM AREA ====== -->
+  <div class="exam-wrap" id="examContainer" style="display:none;">
+    <div class="exam-top">
+      <div class="info">
+        <div id="examTitle">Medical Fundamentals</div>
+        <div class="small-meta">Question <span id="currentNumber">1</span> / <span id="totalNumber">0</span></div>
+      </div>
+      <div>
+        <div class="timer" id="timerDisplay">--:--</div>
+        <div style="height:8px"></div>
+        <div class="progress-bar"><div id="progressBar" class="progress"></div></div>
       </div>
     </div>
 
-    <div class="question-box" id="questionBox"></div>
+    <!-- question card -->
+    <div id="questionCard" class="question-card"></div>
 
-    <div class="exam-buttons">
-      <button id="prevBtn" class="btn secondary">Previous</button>
-      <button id="nextBtn" class="btn primary">Next</button>
-      <button id="submitBtn" class="btn primary" style="display: none;">Submit Exam</button>
+    <!-- navigation -->
+    <div class="nav-actions" style="margin-top:18px;">
+      <button id="prevBtn" class="btn secondary">⬅ Previous</button>
+      <div style="display:flex; gap:10px;">
+        <button id="markBtn" class="btn ghost">☆ Mark</button>
+        <button id="nextBtn" class="btn primary">Next ➡</button>
+        <button id="submitBtn" class="btn primary" style="display:none">Submit Exam</button>
+      </div>
     </div>
-  </section>
+  </div>
 
-  <script src="../js/exam.js"></script>
+  <!-- result section (hidden initially) -->
+  <div class="exam-wrap" id="resultContainer" style="display:none;">
+    <div class="result-wrap">
+      <div class="result-summary">
+        <div class="big" id="resultScore">0%</div>
+        <div>
+          <div class="small-meta">Exam: <strong id="resultTitle"></strong></div>
+          <div class="small-meta">Correct: <strong id="resultCorrect"></strong> / <span id="resultTotal"></span></div>
+          <div class="small-meta">Date: <span id="resultDate"></span></div>
+        </div>
+      </div>
+
+      <div id="reviewList"></div>
+
+      <div style="margin-top:18px; text-align:right;">
+        <button id="backToDashboard" class="btn secondary">Back to Dashboard</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/proctor.js"></script>
   <script src="../js/security.js"></script>
- <script src="../js/proctor.js"></script>
-<script>
-  // start proctoring at exam load
-  if (typeof __proctorStart === "function") {
-    __proctorStart();
-  }
-  // stop proctoring when exam is submitted in exam.js it calls calculateScore()
-  // ensure exam.js calls __proctorStop() before final submit redirect:
-  // e.g., in calculateScore() call window.__proctorStop();
-</script>
-
+  <script src="../js/consent.js"></script>  <!-- updated version (see next section) -->
+  <script src="../js/exam.js"></script>
 </body>
 </html>

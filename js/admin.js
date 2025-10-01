@@ -1,3 +1,9 @@
+fetch("../data/questions.json")
+  .then(res => res.json())
+  .then(data => {
+    localStorage.setItem("questions", JSON.stringify(data));
+  });
+
 // ======== Role Protection =========
 document.addEventListener("DOMContentLoaded", () => {
   const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));

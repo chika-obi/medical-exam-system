@@ -1,0 +1,453 @@
+[
+  {
+    "id": 1,
+    "question": "Which of the following bones is part of the axial skeleton?",
+    "optionA": "Femur",
+    "optionB": "Skull",
+    "optionC": "Clavicle",
+    "optionD": "Scapula",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 2,
+    "question": "What is the primary function of red blood cells?",
+    "optionA": "Transport oxygen",
+    "optionB": "Fight infections",
+    "optionC": "Secrete hormones",
+    "optionD": "Clot blood",
+    "correctAnswer": "A"
+  },
+  {
+    "id": 3,
+    "question": "Which cranial nerve is responsible for vision?",
+    "optionA": "Optic nerve (II)",
+    "optionB": "Oculomotor nerve (III)",
+    "optionC": "Trigeminal nerve (V)",
+    "optionD": "Facial nerve (VII)",
+    "correctAnswer": "A"
+  },
+  {
+    "id": 4,
+    "question": "Which organ produces insulin?",
+    "optionA": "Liver",
+    "optionB": "Pancreas",
+    "optionC": "Kidney",
+    "optionD": "Spleen",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 5,
+    "question": "What is the universal blood donor type?",
+    "optionA": "AB+",
+    "optionB": "O-",
+    "optionC": "A+",
+    "optionD": "B-",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 6,
+    "question": "Which part of the brain controls balance and coordination?",
+    "optionA": "Cerebellum",
+    "optionB": "Cerebrum",
+    "optionC": "Medulla oblongata",
+    "optionD": "Thalamus",
+    "correctAnswer": "A"
+  },
+  {
+    "id": 7,
+    "question": "Which of the following are components of the circulatory system?",
+    "optionA": "Heart, blood vessels, blood",
+    "optionB": "Lungs, heart, kidneys",
+    "optionC": "Brain, spinal cord, nerves",
+    "optionD": "Liver, pancreas, gallbladder",
+    "correctAnswer": "A"
+  },
+  {
+    "id": 8,
+    "question": "The smallest functional unit of the kidney is:",
+    "optionA": "Glomerulus",
+    "optionB": "Nephron",
+    "optionC": "Loop of Henle",
+    "optionD": "Collecting duct",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 9,
+    "question": "Which of the following best describes the function of hemoglobin?",
+    "optionA": "Stores iron",
+    "optionB": "Carries oxygen in red blood cells",
+    "optionC": "Breaks down glucose",
+    "optionD": "Protects against pathogens",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 10,
+    "question": "Which of these pathogens is a virus?",
+    "optionA": "Staphylococcus aureus",
+    "optionB": "HIV",
+    "optionC": "Candida albicans",
+    "optionD": "Plasmodium falciparum",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 11,
+    "question": "Which structure prevents food from entering the trachea?",
+    "optionA": "Epiglottis",
+    "optionB": "Pharynx",
+    "optionC": "Bronchi",
+    "optionD": "Esophagus",
+    "correctAnswer": "A"
+  },
+  {
+    "id": 12,
+    "question": "Which of the following is a common symptom of diabetes mellitus?",
+    "optionA": "Bradycardia",
+    "optionB": "Polyuria",
+    "optionC": "Hypothermia",
+    "optionD": "Hypotension",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 13,
+    "question": "What is the normal range of human body temperature?",
+    "optionA": "35.0–35.5°C",
+    "optionB": "36.5–37.5°C",
+    "optionC": "38.0–39.0°C",
+    "optionD": "34.0–35.0°C",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 14,
+    "question": "The primary pacemaker of the heart is:",
+    "optionA": "AV node",
+    "optionB": "SA node",
+    "optionC": "Bundle of His",
+    "optionD": "Purkinje fibers",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 15,
+    "question": "Which vitamin is essential for blood clotting?",
+    "optionA": "Vitamin C",
+    "optionB": "Vitamin D",
+    "optionC": "Vitamin K",
+    "optionD": "Vitamin A",
+    "correctAnswer": "C"
+  },
+  {
+    "id": 16,
+    "question": "Which part of the digestive system is primarily responsible for nutrient absorption?",
+    "optionA": "Stomach",
+    "optionB": "Small intestine",
+    "optionC": "Large intestine",
+    "optionD": "Pancreas",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 17,
+    "question": "Which of the following is a Gram-negative bacterium?",
+    "optionA": "Streptococcus pyogenes",
+    "optionB": "Escherichia coli",
+    "optionC": "Staphylococcus aureus",
+    "optionD": "Clostridium botulinum",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 18,
+    "question": "What is the main function of the white blood cells?",
+    "optionA": "Transport oxygen",
+    "optionB": "Produce antibodies",
+    "optionC": "Aid in blood clotting",
+    "optionD": "Absorb nutrients",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 19,
+    "question": "Which hormone regulates the sleep-wake cycle?",
+    "optionA": "Insulin",
+    "optionB": "Melatonin",
+    "optionC": "Adrenaline",
+    "optionD": "Cortisol",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 20,
+    "question": "Which is the most common route of drug administration?",
+    "optionA": "Intravenous",
+    "optionB": "Oral",
+    "optionC": "Intramuscular",
+    "optionD": "Subcutaneous",
+    "correctAnswer": "B"
+  },
+    {
+    "id": 21,
+    "question": "Which of the following is a symptom of myocardial infarction (heart attack)?",
+    "optionA": "Sudden severe chest pain",
+    "optionB": "Fever and chills",
+    "optionC": "Itchy skin",
+    "optionD": "Frequent urination",
+    "correctAnswer": "A"
+  },
+  {
+    "id": 22,
+    "question": "Which blood vessel carries oxygenated blood from the lungs to the heart?",
+    "optionA": "Pulmonary artery",
+    "optionB": "Pulmonary vein",
+    "optionC": "Aorta",
+    "optionD": "Vena cava",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 23,
+    "question": "Which structure of the eye is responsible for focusing light on the retina?",
+    "optionA": "Lens",
+    "optionB": "Iris",
+    "optionC": "Cornea",
+    "optionD": "Optic nerve",
+    "correctAnswer": "A"
+  },
+  {
+    "id": 24,
+    "question": "Which organ stores bile produced by the liver?",
+    "optionA": "Pancreas",
+    "optionB": "Gallbladder",
+    "optionC": "Spleen",
+    "optionD": "Duodenum",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 25,
+    "question": "What is the term for the body's ability to maintain a stable internal environment?",
+    "optionA": "Hemostasis",
+    "optionB": "Homeostasis",
+    "optionC": "Metabolism",
+    "optionD": "Thermoregulation",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 26,
+    "question": "Which of the following is NOT a type of white blood cell?",
+    "optionA": "Neutrophil",
+    "optionB": "Lymphocyte",
+    "optionC": "Platelet",
+    "optionD": "Monocyte",
+    "correctAnswer": "C"
+  },
+  {
+    "id": 27,
+    "question": "Which vitamin deficiency leads to scurvy?",
+    "optionA": "Vitamin B12",
+    "optionB": "Vitamin C",
+    "optionC": "Vitamin D",
+    "optionD": "Vitamin K",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 28,
+    "question": "What is the normal adult respiratory rate?",
+    "optionA": "8-10 breaths per minute",
+    "optionB": "12-20 breaths per minute",
+    "optionC": "25-30 breaths per minute",
+    "optionD": "35-40 breaths per minute",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 29,
+    "question": "Which type of immunity is acquired after recovering from a disease?",
+    "optionA": "Innate immunity",
+    "optionB": "Passive immunity",
+    "optionC": "Active acquired immunity",
+    "optionD": "Artificial immunity",
+    "correctAnswer": "C"
+  },
+  {
+    "id": 30,
+    "question": "Which part of the neuron transmits nerve impulses away from the cell body?",
+    "optionA": "Dendrite",
+    "optionB": "Axon",
+    "optionC": "Synapse",
+    "optionD": "Myelin sheath",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 31,
+    "question": "Which of the following is used to measure blood pressure?",
+    "optionA": "Thermometer",
+    "optionB": "Sphygmomanometer",
+    "optionC": "Spirometer",
+    "optionD": "Stethoscope",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 32,
+    "question": "What is the main site of gas exchange in the lungs?",
+    "optionA": "Bronchioles",
+    "optionB": "Alveoli",
+    "optionC": "Trachea",
+    "optionD": "Pleura",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 33,
+    "question": "Which blood group is known as the universal recipient?",
+    "optionA": "A+",
+    "optionB": "AB+",
+    "optionC": "O+",
+    "optionD": "B-",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 34,
+    "question": "Which of the following bacteria causes tuberculosis?",
+    "optionA": "Staphylococcus aureus",
+    "optionB": "Mycobacterium tuberculosis",
+    "optionC": "Escherichia coli",
+    "optionD": "Clostridium tetani",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 35,
+    "question": "What is the function of the sinoatrial (SA) node?",
+    "optionA": "Blood filtration",
+    "optionB": "Regulates heart rate",
+    "optionC": "Produces insulin",
+    "optionD": "Secretes bile",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 36,
+    "question": "What type of joint is found in the shoulder?",
+    "optionA": "Hinge joint",
+    "optionB": "Ball and socket joint",
+    "optionC": "Pivot joint",
+    "optionD": "Saddle joint",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 37,
+    "question": "What is the function of the cerebrum?",
+    "optionA": "Regulate heartbeat",
+    "optionB": "Coordinate voluntary actions",
+    "optionC": "Control reflex actions",
+    "optionD": "Filter blood",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 38,
+    "question": "Which of the following is a parasitic disease?",
+    "optionA": "Influenza",
+    "optionB": "Malaria",
+    "optionC": "Tuberculosis",
+    "optionD": "Cholera",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 39,
+    "question": "Which part of the digestive system produces bile?",
+    "optionA": "Gallbladder",
+    "optionB": "Liver",
+    "optionC": "Pancreas",
+    "optionD": "Stomach",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 40,
+    "question": "Which of these is NOT a function of the liver?",
+    "optionA": "Detoxification",
+    "optionB": "Production of bile",
+    "optionC": "Storage of glycogen",
+    "optionD": "Production of insulin",
+    "correctAnswer": "D"
+  },
+  {
+    "id": 41,
+    "question": "What is the term for inflammation of the liver?",
+    "optionA": "Nephritis",
+    "optionB": "Hepatitis",
+    "optionC": "Gastritis",
+    "optionD": "Arthritis",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 42,
+    "question": "What is the incubation period for HIV before symptoms appear?",
+    "optionA": "2-3 days",
+    "optionB": "2-4 weeks",
+    "optionC": "Months to years",
+    "optionD": "48 hours",
+    "correctAnswer": "C"
+  },
+  {
+    "id": 43,
+    "question": "Which part of the blood is responsible for clotting?",
+    "optionA": "Plasma",
+    "optionB": "Platelets",
+    "optionC": "Red blood cells",
+    "optionD": "White blood cells",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 44,
+    "question": "What is the common name for cerebrovascular accident?",
+    "optionA": "Heart attack",
+    "optionB": "Stroke",
+    "optionC": "Asthma",
+    "optionD": "Epilepsy",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 45,
+    "question": "Which organ produces digestive enzymes and hormones like insulin?",
+    "optionA": "Pancreas",
+    "optionB": "Liver",
+    "optionC": "Gallbladder",
+    "optionD": "Spleen",
+    "correctAnswer": "A"
+  },
+  {
+    "id": 46,
+    "question": "Which disease is caused by vitamin D deficiency?",
+    "optionA": "Rickets",
+    "optionB": "Scurvy",
+    "optionC": "Pellagra",
+    "optionD": "Anemia",
+    "correctAnswer": "A"
+  },
+  {
+    "id": 47,
+    "question": "Which part of the human brain regulates body temperature?",
+    "optionA": "Hypothalamus",
+    "optionB": "Cerebellum",
+    "optionC": "Medulla oblongata",
+    "optionD": "Thalamus",
+    "correctAnswer": "A"
+  },
+  {
+    "id": 48,
+    "question": "Which medical term describes high blood pressure?",
+    "optionA": "Hypotension",
+    "optionB": "Hypertension",
+    "optionC": "Tachycardia",
+    "optionD": "Bradycardia",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 49,
+    "question": "What is the function of platelets?",
+    "optionA": "Fight infections",
+    "optionB": "Clot blood",
+    "optionC": "Transport oxygen",
+    "optionD": "Absorb nutrients",
+    "correctAnswer": "B"
+  },
+  {
+    "id": 50,
+    "question": "Which of these diseases is caused by a deficiency of iodine?",
+    "optionA": "Goitre",
+    "optionB": "Scurvy",
+    "optionC": "Beriberi",
+    "optionD": "Pellagra",
+    "correctAnswer": "A"
+  }
+]
+
