@@ -1,121 +1,712 @@
-<!-- # Admin dashboard -->
- <!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Dashboard - MedExam System</title>
-  <link rel="stylesheet" href="../css/style.css" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Admin Dashboard — MedEx</title>
+
+<!-- keep linking your project css if you still want; this file also contains styling to ensure visual parity -->
+<link rel="stylesheet" href="../css/style.css" />
+<link rel="stylesheet" href="../css/admin.css" />
+
+<style>
+  /* ===== Admin Dashboard — Custom Styles (blend light/dark, gradient buttons) ===== */
+  :root{
+    --bg:#f6f8fb;
+    --surface:#ffffff;
+    --muted:#64707a;
+    --navy:#082a66;
+    --teal:#0fa3a3;
+    --accent1: #0fa3a3;
+    --accent2: #2e7d32;
+    --glass: rgba(255,255,255,0.6);
+    --radius: 12px;
+    --card-shadow: 0 12px 40px rgba(8,18,40,0.06);
+    --maxw:1200px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+    background: linear-gradient(180deg,#f7fbff 0%, var(--bg) 100%);
+    color:#0b2b3a;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .wrap{max-width:var(--maxw);margin:28px auto;display:flex;gap:20px;padding:0 16px}
+  aside.sidebar{
+    width:280px;background:linear-gradient(180deg,var(--navy),#0fa3a3);
+    color:#fff;border-radius:14px;padding:20px;box-shadow:var(--card-shadow);flex-shrink:0;position:sticky;top:24px;height:calc(100vh - 48px);overflow:auto;
+  }
+  .brand{font-weight:800;font-size:1.25rem;display:flex;gap:8px;align-items:center;margin-bottom:6px}
+  .brand .logo{width:36px;height:36px;border-radius:8px;background:linear-gradient(90deg,var(--accent1),var(--accent2));display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:800}
+  .muted{color:rgba(255,255,255,0.9);font-size:0.95rem}
+  nav.nav a{display:block;color:rgba(255,255,255,0.95);text-decoration:none;padding:10px;border-radius:10px;margin-top:8px;font-weight:700}
+  nav.nav a.active{background:rgba(255,255,255,0.06);padding-left:16px}
+
+  main.main{flex:1}
+  header.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+  header.top h1{color:var(--navy);font-size:1.5rem}
+  .header-controls{display:flex;gap:10px;align-items:center}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:18px}
+  .card{background:var(--surface);padding:14px;border-radius:12px;box-shadow:var(--card-shadow)}
+  .card h4{color:var(--muted);font-size:0.88rem;margin-bottom:8px}
+  .card .big{font-weight:800;font-size:1.4rem;color:var(--navy)}
+
+  .grid-2{display:grid;grid-template-columns:1fr 360px;gap:16px}
+  .panel{background:var(--surface);padding:16px;border-radius:12px;box-shadow:var(--card-shadow)}
+
+  .search{padding:10px;border-radius:10px;border:1px solid #eef6ff;width:100%;outline:none}
+  table{width:100%;border-collapse:collapse;font-size:0.95rem}
+  th,td{padding:8px;border-bottom:1px solid #f1f7ff;text-align:left}
+  th{color:var(--muted);font-weight:700}
+
+  /* Buttons: gradient primary + subtle ghost */
+  .btn{padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
+  .btn.primary{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#fff;box-shadow:0 8px 18px rgba(15,143,143,0.12)}
+  .btn.ghost{background:transparent;border:1px solid #eef6ff;color:var(--navy)}
+  .btn.danger{background:#d63e3e;color:#fff}
+
+  .actions{display:flex;gap:8px;flex-wrap:wrap}
+  .small{font-size:0.88rem;color:var(--muted)}
+
+  /* modal */
+  #modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:linear-gradient(rgba(2,6,23,0.45),rgba(2,6,23,0.45));z-index:9999}
+  #modal .box{width:92%;max-width:900px;background:var(--surface);border-radius:12px;padding:18px;box-shadow:0 20px 60px rgba(2,6,23,0.2)}
+  .modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+
+  /* proctor filters */
+  .filters{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+  .chip{background:#f1fbfa;padding:6px 8px;border-radius:999px;color:var(--navy);font-weight:700;border:1px solid #e6fbf9}
+
+  /* toast */
+  #toast{position:fixed;right:20px;bottom:20px;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#fff;padding:10px 14px;border-radius:12px;box-shadow:0 10px 30px rgba(8,18,40,0.12);display:none;z-index:10000}
+
+  /* responsive */
+  @media(max-width:980px){
+    .wrap{flex-direction:column;padding:12px}
+    aside.sidebar{position:relative;width:100%;height:auto}
+    .grid-2{grid-template-columns:1fr}
+  }
+</style>
 </head>
 <body>
-  <!-- ======= Header ======= -->
-  <header>
-    <div class="container">
-      <h1 class="logo">MedExam<span>System</span></h1>
-      <nav>
-        <ul>
-          <li><a href="admin-dashboard.html" class="active">Dashboard</a></li>
-          <li><a href="#" id="logoutBtn">Logout</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
 
-  <!-- ======= Dashboard Layout ======= -->
-  <section class="dashboard">
-    <aside class="sidebar">
-      <h2>Admin Menu</h2>
-      <ul>
-        <li><a href="#" data-section="overview">📊 Overview</a></li>
-        <li><a href="#" data-section="questions">📝 Manage Questions</a></li>
-        <li><a href="#" data-section="schedule">📅 Schedule Exam</a></li>
-        <li><a href="#" data-section="students">👩‍🎓 Student Activity</a></li>
-        <li><a href="#" data-section="results">📈 Results</a></li>
-        <li><a href="#" data-section="proctor">🔒 Proctoring Logs</a></li>
+<div class="wrap" role="application" aria-label="Admin Dashboard">
 
-      </ul>
-    </aside>
+  <!-- SIDEBAR -->
+  <aside class="sidebar" aria-label="Sidebar">
+    <div class="brand"><div class="logo">M</div><div>MedEx <span style="color:var(--teal);margin-left:6px;font-weight:900">Admin</span></div></div>
+    <div style="margin-top:6px" class="muted">Welcome, <strong id="adminName">Admin</strong></div>
 
-    <main class="content">
-      <!-- Default view -->
-      <section id="overview" class="section active">
-        <h2>Welcome, Admin 👩‍⚕️</h2>
-        <p>Here you can manage exams, create questions, and monitor student performance.</p>
-      </section>
+    <nav class="nav" id="adminNav" style="margin-top:18px">
+      <a href="#" data-section="overview" class="active">Overview</a>
+      <a href="#" data-section="exams">Exam Management</a>
+      <a href="#" data-section="results">Results & Analytics</a>
+      <a href="#" data-section="proctor">Proctor Logs</a>
+      <a href="#" data-section="students">Student List</a>
+      <a href="#" id="exportJSON" class="btn ghost" style="margin-top:12px">Export JSON</a>
+      <a href="#" id="importJSON" class="btn ghost" style="margin-top:8px">Import JSON</a>
+      <a href="#" id="logoutBtn" class="btn ghost" style="margin-top:12px">Logout</a>
+    </nav>
+  </aside>
 
-      <!-- Question Management -->
-      <section id="questions" class="section">
-        <h2>📝 Manage Questions</h2>
-        <form id="questionForm">
-          <input type="text" id="question" placeholder="Enter question" required />
-          <input type="text" id="optionA" placeholder="Option A" required />
-          <input type="text" id="optionB" placeholder="Option B" required />
-          <input type="text" id="optionC" placeholder="Option C" required />
-          <input type="text" id="optionD" placeholder="Option D" required />
-          <select id="correctAnswer" required>
-            <option value="">Select Correct Answer</option>
-            <option value="A">Option A</option>
-            <option value="B">Option B</option>
-            <option value="C">Option C</option>
-            <option value="D">Option D</option>
+  <!-- MAIN -->
+  <main class="main">
+    <header class="top">
+      <h1>Admin Dashboard</h1>
+      <div class="header-controls">
+        <div class="small">Today: <strong id="today"></strong></div>
+        <div class="actions">
+          <button id="btnClearAll" class="btn danger">Clear All</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Overview -->
+    <section id="overviewSection" class="section">
+      <div class="cards">
+        <div class="card"><h4>Total Students</h4><div class="big" id="statStudents">0</div><div class="small">Registered students</div></div>
+        <div class="card"><h4>Available Exams</h4><div class="big" id="statExams">0</div><div class="small">Scheduled/active exams</div></div>
+        <div class="card"><h4>Total Attempts</h4><div class="big" id="statAttempts">0</div><div class="small">Exam submissions</div></div>
+        <div class="card"><h4>Average Score</h4><div class="big" id="statAvg">0%</div><div class="small">Across all attempts</div></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <h3 style="margin-bottom:10px">Recent Results</h3>
+          <table id="recentResults">
+            <thead><tr><th>Student</th><th>Exam</th><th>Score</th><th>Date</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <h3 style="margin-bottom:10px">Analytics</h3>
+          <canvas id="passRateChart" width="320" height="220"></canvas>
+          <div style="height:12px"></div>
+          <canvas id="attemptsChart" width="320" height="160"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Exam Management -->
+    <section id="examsSection" class="section" style="display:none;margin-top:16px">
+      <div class="panel" style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+          <h3>Manage Exams & Questions</h3>
+          <div class="actions">
+            <button id="openAddExam" class="btn primary">+ Create Exam</button>
+            <button id="openAddQuestion" class="btn primary">+ Add Question</button>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <input id="qSearch" class="search" placeholder="Search questions..." />
+          <select id="filterExamForQuestion" class="search" style="max-width:260px">
+            <option value="">All exams</option>
           </select>
-          <button type="submit" class="btn primary">Add Question</button>
-        </form>
+        </div>
+      </div>
 
-        <h3>📚 Question List</h3>
-        <ul id="questionList"></ul>
-      </section>
+      <div class="grid-2">
+        <div class="panel">
+          <h4>Questions</h4>
+          <table id="questionsTable"><thead><tr><th>#</th><th>Question</th><th>Exam</th><th>Correct</th><th></th></tr></thead><tbody></tbody></table>
+        </div>
 
-      <!-- Exam Scheduling -->
-      <section id="schedule" class="section">
-        <h2>📅 Schedule Exam</h2>
-        <form id="scheduleForm">
-          <input type="text" id="examTitle" placeholder="Exam Title" required />
-          <input type="datetime-local" id="startDate" required />
-          <input type="datetime-local" id="endDate" required />
-          <button type="submit" class="btn primary">Schedule Exam</button>
-        </form>
+        <div class="panel">
+          <h4>Exams</h4>
+          <table id="examList"><thead><tr><th>Title</th><th>Duration</th><th></th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+    </section>
 
-        <h3>🗓️ Scheduled Exams</h3>
-        <ul id="examList"></ul>
-      </section>
+    <!-- Results -->
+    <section id="resultsSection" class="section" style="display:none;margin-top:16px">
+      <div class="panel">
+        <h3>All Results</h3>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+          <input id="filterEmail" class="search" placeholder="Filter by student email or name" />
+          <button id="refreshResults" class="btn ghost">Refresh</button>
+          <button id="exportCSV" class="btn ghost">Export CSV</button>
+        </div>
+        <div style="margin-top:12px;overflow:auto">
+          <table id="resultsTable"><thead><tr><th>Student</th><th>Exam</th><th>Score</th><th>Date</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+    </section>
 
-      <!-- Students & Results (placeholders for now) -->
-      <section id="students" class="section">
-        <h2>👩‍🎓 Student Activity</h2>
-        <p>Monitor student login, attempts, and proctoring logs (Coming Soon).</p>
-      </section>
+    <!-- Proctor Logs -->
+    <section id="proctorSection" class="section" style="display:none;margin-top:16px">
+      <div class="panel">
+        <h3>Proctor Logs</h3>
+        <div class="filters" style="margin-top:8px">
+          <input id="proctorFilterEmail" class="search" placeholder="Filter by student email" style="max-width:220px" />
+          <select id="proctorFilterExam" class="search" style="max-width:220px"><option value="">All exams</option></select>
+          <input id="proctorFrom" type="date" class="search" />
+          <input id="proctorTo" type="date" class="search" />
+          <button id="refreshProctor" class="btn ghost">Apply</button>
+          <button id="exportProctorCSV" class="btn ghost">Export CSV</button>
+        </div>
 
-      <section id="results" class="section">
-        <h2>📈 Results</h2>
-        <p>View exam performance analytics (Coming Soon).</p>
-      </section>
-<!-- Proctor Logs Section -->
-<section id="proctor" class="section">
-  <h2>📸 Proctoring Logs</h2>
+        <div style="margin-top:12px;overflow:auto">
+          <table id="proctorTable"><thead><tr><th>Time</th><th>Type</th><th>Student</th><th>Exam</th><th></th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+    </section>
 
-  <div class="proctor-controls">
-    <input type="text" id="proctorFilterEmail" placeholder="Filter by student email" />
-    <input type="text" id="proctorFilterExam" placeholder="Filter by exam title" />
-    <button id="proctorRefresh" class="btn secondary">Refresh</button>
-    <button id="clearProctorLogs" class="btn" style="background:#e63946;color:#fff;">Clear Logs</button>
-  </div>
+    <!-- Student List -->
+    <section id="studentsSection" class="section" style="display:none;margin-top:16px">
+      <div class="panel">
+        <h3>Registered Students</h3>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+          <input id="studentSearch" class="search" placeholder="Search by name or email" />
+          <button id="refreshStudents" class="btn ghost">Refresh</button>
+        </div>
+        <div style="margin-top:12px;overflow:auto">
+          <table id="studentsTable"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th></th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+    </section>
 
-  <ul id="proctorList"></ul>
-</section>
-
-<!-- Modal for viewing snapshot -->
-<div id="proctorModal" class="modal" style="display:none;">
-  <div class="modal-content">
-    <span id="modalClose" class="modal-close">&times;</span>
-    <div id="modalBody"></div>
-  </div>
+  </main>
 </div>
 
+<!-- Modal + Toast -->
+<div id="modal" role="dialog" aria-modal="true"><div class="box" id="modalBox"></div></div>
+<div id="toast"></div>
 
-    </main>
-  </section>
+<!-- hidden input for import -->
+<input id="importFile" type="file" accept=".json" style="display:none" />
 
-  <script src="../js/admin.js"></script>
+<script>
+/* ===========================
+   Admin Dashboard JS
+   - LocalStorage-based (no backend)
+   - Keys used:
+     - 'questions' : array of {id,question,options[],correctAnswerText,examId,examTitle}
+     - 'exams'     : array of {id,examTitle,durationMinutes,created}
+     - 'examResults': array saved by student dashboard (attempts)
+     - 'proctorLogs': array of proctor events {id,timestamp,type,email,examTitle,extra}
+     - 'users'     : array of registered users (students)
+     - 'loggedInUser' : current admin object
+   =========================== */
+
+(function(){
+  // DOM helpers
+  const $ = s => document.querySelector(s);
+  const $$ = s => Array.from(document.querySelectorAll(s));
+  const modal = $('#modal'), modalBox = $('#modalBox'), toastEl = $('#toast');
+
+  // Keys
+  const K = { QUESTIONS: 'questions', EXAMS: 'exams', RESULTS: 'examResults', PROCTOR: 'proctorLogs', USERS: 'users', LOGGED: 'loggedInUser' };
+
+  // init admin user if missing
+  let admin = JSON.parse(localStorage.getItem(K.LOGGED) || 'null');
+  if(!admin || admin.role !== 'admin'){
+    admin = { fullname: 'Administrator', email: 'admin@medex.local', role: 'admin' };
+    localStorage.setItem(K.LOGGED, JSON.stringify(admin));
+  }
+  $('#adminName').textContent = admin.fullname || admin.email;
+  $('#today').textContent = new Date().toDateString();
+
+  // safe getters/setters
+  const getQuestions = ()=> JSON.parse(localStorage.getItem(K.QUESTIONS) || '[]');
+  const setQuestions = (v)=> localStorage.setItem(K.QUESTIONS, JSON.stringify(v));
+  const getExams = ()=> JSON.parse(localStorage.getItem(K.EXAMS) || '[]');
+  const setExams = (v)=> localStorage.setItem(K.EXAMS, JSON.stringify(v));
+  const getResults = ()=> JSON.parse(localStorage.getItem(K.RESULTS) || '[]');
+  const getProctor = ()=> JSON.parse(localStorage.getItem(K.PROCTOR) || '[]');
+  const setProctor = (v)=> localStorage.setItem(K.PROCTOR, JSON.stringify(v));
+  const getUsers = ()=> JSON.parse(localStorage.getItem(K.USERS) || '[]');
+
+  // small utilities
+  function uid(){ return 'id' + Math.random().toString(36).slice(2,9); }
+  function toast(msg, ms=2400){ toastEl.textContent = msg; toastEl.style.display='block'; setTimeout(()=>toastEl.style.display='none', ms); }
+
+  // navigation handler
+  const navLinks = $$('#adminNav a');
+  navLinks.forEach(a => a.addEventListener('click', (e)=>{
+    e.preventDefault();
+    navLinks.forEach(x=>x.classList.remove('active'));
+    a.classList.add('active');
+    const s = a.dataset.section;
+    // hide all sections
+    $$('.section').forEach(sec=>sec.style.display='none');
+    // show chosen
+    document.getElementById(s + 'Section').style.display = 'block';
+    // refresh content
+    if(s==='overview') loadOverview();
+    if(s==='exams') { renderQuestions(); renderExams(); populateExamFilter(); }
+    if(s==='results') loadResults();
+    if(s==='proctor') { renderProctor(); populateProctorExamFilter(); }
+    if(s==='students') renderStudents();
+  }));
+
+  // default load
+  loadOverview();
+
+  /* -------------------------
+     Overview: stats + charts
+  ------------------------- */
+  function loadOverview(){
+    const users = getUsers(); const exams = getExams(); const results = getResults();
+    $('#statStudents').textContent = (users||[]).length;
+    $('#statExams').textContent = (exams||[]).length;
+    $('#statAttempts').textContent = (results||[]).length;
+    const avg = results && results.length ? (results.reduce((s,r)=>s+(Number(r.score)||0),0)/results.length).toFixed(2) : 0;
+    $('#statAvg').textContent = avg + '%';
+    renderRecentResults();
+    drawPassRateChart(); drawAttemptsChart();
+  }
+
+  function renderRecentResults(){
+    const tbody = $('#recentResults tbody'); tbody.innerHTML='';
+    getResults().slice(-8).reverse().forEach(r=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${escapeHtml(r.fullname||r.email)}</td><td>${escapeHtml(r.examTitle)}</td><td>${r.score}%</td><td>${new Date(r.date).toLocaleString()}</td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  /* =========================
+     EXAM & QUESTION management
+     ========================= */
+  // open create exam modal
+  $('#openAddExam').addEventListener('click', ()=>{
+    openModal(`<h3>Create Exam</h3>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <input id="m_examTitle" placeholder="Exam title (e.g. Anatomy 101)" class="search" />
+        <input id="m_examDuration" type="number" min="1" placeholder="Duration (mins)" class="search" style="max-width:160px"/>
+      </div>
+      <div class="modal-footer"><button class="btn ghost" id="m_cancel">Cancel</button><button class="btn primary" id="m_save">Create</button></div>`, ()=>{
+        $('#m_cancel').addEventListener('click', closeModal);
+        $('#m_save').addEventListener('click', ()=>{
+          const title = $('#m_examTitle').value.trim(); const dur = Number($('#m_examDuration').value) || 60;
+          if(!title) return alert('Enter exam title');
+          const ex = getExams(); ex.push({ id: uid(), examTitle: title, durationMinutes: dur, created: new Date().toISOString() });
+          setExams(ex);
+          closeModal(); renderExams(); populateExamFilter(); toast('Exam created');
+        });
+    });
+  });
+
+  // Add question modal
+  $('#openAddQuestion').addEventListener('click', openAddQuestionModal);
+
+  function openAddQuestionModal(){
+    const exams = getExams();
+    const examOptions = exams.length ? exams.map(ex=>`<option value="${ex.id}">${escapeHtml(ex.examTitle)}</option>`).join('') : '<option value="">(unassigned)</option>';
+    openModal(`<h3>Add Question</h3>
+      <div style="margin-top:8px"><textarea id="m_qtext" placeholder="Write the question" style="width:100%;height:80px"></textarea></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+        <input id="m_a" placeholder="Option A" class="search"/><input id="m_b" placeholder="Option B" class="search"/>
+        <input id="m_c" placeholder="Option C" class="search"/><input id="m_d" placeholder="Option D" class="search"/>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+        <input id="m_correct" placeholder="Correct option text (exact)" class="search" style="flex:1"/>
+        <select id="m_examSelect" class="search" style="max-width:200px">${examOptions}</select>
+      </div>
+      <div class="modal-footer"><button class="btn ghost" id="m_cancelQ">Cancel</button><button class="btn primary" id="m_saveQ">Add Question</button></div>`,
+      ()=>{
+        $('#m_cancelQ').addEventListener('click', closeModal);
+        $('#m_saveQ').addEventListener('click', ()=>{
+          const q = $('#m_qtext').value.trim();
+          const ops = [$('#m_a').value, $('#m_b').value, $('#m_c').value, $('#m_d').value].map(x=>x.trim()).filter(Boolean);
+          const correct = $('#m_correct').value.trim();
+          const examId = $('#m_examSelect').value || '';
+          if(!q) return alert('Question text required');
+          if(ops.length < 2) return alert('Provide at least two options');
+          if(!correct) return alert('Correct option required');
+          if(!ops.includes(correct)) return alert('Correct answer must match one option exactly');
+          const examTitle = (getExams().find(x=>String(x.id)===String(examId))||{}).examTitle || 'Unassigned';
+          const qs = getQuestions();
+          qs.push({ id: uid(), question: q, options: ops, correctAnswerText: correct, examId: examId || 'default', examTitle: examTitle });
+          setQuestions(qs); closeModal(); renderQuestions($('#qSearch').value); populateExamFilter(); toast('Question added');
+        });
+    });
+  }
+
+  // render questions table
+  function renderQuestions(filter=''){
+    const tbody = $('#questionsTable tbody'); tbody.innerHTML = '';
+    const qs = getQuestions();
+    qs.forEach((q,i)=>{
+      if(filter && !String(q.question||'').toLowerCase().includes(filter.toLowerCase())) return;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${i+1}</td>
+        <td style="max-width:360px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(q.question)}</td>
+        <td>${escapeHtml(q.examTitle||'Unassigned')}</td>
+        <td>${escapeHtml(q.correctAnswerText||'')}</td>
+        <td style="white-space:nowrap">
+          <button class="btn ghost btn-edit" data-i="${i}">Edit</button>
+          <button class="btn danger btn-del" data-i="${i}">Delete</button>
+        </td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // question table delegation
+  $('#questionsTable tbody').addEventListener('click', (ev)=>{
+    const btn = ev.target.closest('button');
+    if(!btn) return;
+    const idx = Number(btn.dataset.i);
+    if(btn.classList.contains('btn-edit')) openEditQuestion(idx);
+    if(btn.classList.contains('btn-del')) {
+      if(!confirm('Delete question?')) return;
+      const qs = getQuestions(); qs.splice(idx,1); setQuestions(qs); renderQuestions($('#qSearch').value); toast('Question deleted');
+    }
+  });
+
+  function openEditQuestion(i){
+    const qs = getQuestions(); const q = qs[i];
+    if(!q) return alert('Question not found');
+    const exams = getExams(); const examOptions = exams.length ? exams.map(ex=>`<option value="${ex.id}" ${String(ex.id)===String(q.examId)?'selected':''}>${escapeHtml(ex.examTitle)}</option>`).join('') : '<option value="">(none)</option>';
+    openModal(`<h3>Edit Question</h3>
+      <div style="margin-top:8px"><textarea id="m_qtext" style="width:100%;height:80px">${escapeHtml(q.question)}</textarea></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+        <input id="m_a" placeholder="Option A" class="search" value="${escapeHtml(q.options[0]||'')}" />
+        <input id="m_b" placeholder="Option B" class="search" value="${escapeHtml(q.options[1]||'')}" />
+        <input id="m_c" placeholder="Option C" class="search" value="${escapeHtml(q.options[2]||'')}" />
+        <input id="m_d" placeholder="Option D" class="search" value="${escapeHtml(q.options[3]||'')}" />
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+        <input id="m_correct" placeholder="Correct option text" class="search" style="flex:1" value="${escapeHtml(q.correctAnswerText||'')}" />
+        <select id="m_examSelect" class="search" style="max-width:200px">${examOptions}</select>
+      </div>
+      <div class="modal-footer"><button class="btn ghost" id="m_cancelE">Cancel</button><button class="btn primary" id="m_saveE">Save</button></div>`, ()=>{
+        $('#m_cancelE').addEventListener('click', closeModal);
+        $('#m_saveE').addEventListener('click', ()=>{
+          const qtext = $('#m_qtext').value.trim();
+          const ops = [$('#m_a').value, $('#m_b').value, $('#m_c').value, $('#m_d').value].map(x=>x.trim()).filter(Boolean);
+          const correct = $('#m_correct').value.trim();
+          const examId = $('#m_examSelect').value || '';
+          if(!qtext) return alert('Question text required');
+          if(ops.length < 2) return alert('Provide at least two options');
+          if(!correct) return alert('Correct option required');
+          if(!ops.includes(correct)) return alert('Correct option must match one of the options');
+          q.question = qtext; q.options = ops; q.correctAnswerText = correct; q.examId = examId || 'default'; q.examTitle = (getExams().find(x=>String(x.id)===String(examId))||{}).examTitle || 'Unassigned';
+          setQuestions(getQuestions()); closeModal(); renderQuestions($('#qSearch').value); toast('Question updated');
+        });
+    });
+  }
+
+  // search questions
+  $('#qSearch').addEventListener('input', (e)=> renderQuestions(e.target.value));
+
+  // render exams and exam actions
+  function renderExams(){
+    const tbody = $('#examList tbody'); tbody.innerHTML='';
+    getExams().forEach(ex=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${escapeHtml(ex.examTitle)}</td><td>${Number(ex.durationMinutes||60)} min</td><td><button class="btn ghost btn-del-exam" data-id="${ex.id}">Delete</button></td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // delete exam handler
+  $('#examList tbody').addEventListener('click', (ev)=>{
+    const btn = ev.target.closest('button');
+    if(!btn) return;
+    if(btn.classList.contains('btn-del-exam')){
+      const id = btn.dataset.id;
+      if(!confirm('Delete exam? This will unassign related questions.')) return;
+      const exs = getExams().filter(x=>String(x.id)!==String(id)); setExams(exs);
+      const qs = getQuestions().map(q=>{ if(String(q.examId)===String(id)){ q.examId='default'; q.examTitle='Unassigned'; } return q; });
+      setQuestions(qs); renderExams(); renderQuestions($('#qSearch').value); populateExamFilter(); toast('Exam deleted');
+    }
+  });
+
+  function populateExamFilter(){
+    const sel = $('#filterExamForQuestion'); const proctorSel = $('#proctorFilterExam');
+    sel.innerHTML = '<option value="">All exams</option>'; proctorSel && (proctorSel.innerHTML = '<option value="">All exams</option>');
+    getExams().forEach(ex=>{
+      const opt = `<option value="${ex.id}">${escapeHtml(ex.examTitle)}</option>`;
+      sel.insertAdjacentHTML('beforeend', opt);
+      proctorSel && proctorSel.insertAdjacentHTML('beforeend', opt);
+    });
+  }
+
+  /* =================
+     Results & analytics
+     ================= */
+  $('#refreshResults').addEventListener('click', loadResults);
+  function loadResults(){
+    const tbody = $('#resultsTable tbody'); tbody.innerHTML='';
+    const filter = $('#filterEmail').value.trim().toLowerCase();
+    getResults().slice().reverse().forEach(r=>{
+      if(filter && !(`${r.email} ${r.fullname}`).toLowerCase().includes(filter)) return;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${escapeHtml(r.fullname||r.email)}</td><td>${escapeHtml(r.examTitle)}</td><td>${r.score}%</td><td>${new Date(r.date).toLocaleString()}</td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  $('#exportCSV').addEventListener('click', ()=>{
+    const rows = [['fullname','email','examTitle','score','date','total','correct']];
+    getResults().forEach(r=> rows.push([r.fullname||'', r.email||'', r.examTitle||'', r.score||'', r.date||'', r.total||'', r.correct||'']));
+    downloadCSV(rows, 'exam-results.csv');
+  });
+
+  /* =====================
+     Proctor log + filters
+     ===================== */
+  $('#refreshProctor').addEventListener('click', renderProctor);
+  $('#exportProctorCSV').addEventListener('click', ()=>{
+    const logs = filterProctorRaw();
+    const rows = [['timestamp','type','email','examTitle','meta']];
+    logs.forEach(l=> rows.push([l.timestamp, l.type, l.email||'', l.examTitle||'', JSON.stringify(l.extra||'')]));
+    downloadCSV(rows, 'proctor-logs.csv');
+  });
+
+  function filterProctorRaw(){
+    const fEmail = $('#proctorFilterEmail').value.trim().toLowerCase();
+    const fExam = $('#proctorFilterExam').value.trim();
+    const from = $('#proctorFrom').value; const to = $('#proctorTo').value;
+    return getProctor().slice().reverse().filter(l=>{
+      if(fEmail && !(l.email||'').toLowerCase().includes(fEmail)) return false;
+      if(fExam && String(l.examId) !== String(fExam) && l.examTitle !== fExam) return false;
+      if(from && new Date(l.timestamp) < new Date(from + 'T00:00:00')) return false;
+      if(to && new Date(l.timestamp) > new Date(to + 'T23:59:59')) return false;
+      return true;
+    });
+  }
+
+  function renderProctor(){
+    const tbody = $('#proctorTable tbody'); tbody.innerHTML='';
+    const logs = filterProctorRaw();
+    logs.forEach(l=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${new Date(l.timestamp).toLocaleString()}</td><td>${escapeHtml(l.type)}</td><td>${escapeHtml(l.email||'N/A')}</td><td>${escapeHtml(l.examTitle||'N/A')}</td>
+        <td><button class="btn ghost btn-view-proctor" data-id="${l.id}">View</button></td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // proctor view
+  $('#proctorTable tbody').addEventListener('click', (ev)=>{
+    const btn = ev.target.closest('button');
+    if(!btn) return;
+    if(btn.classList.contains('btn-view-proctor')){
+      const id = btn.dataset.id; const l = getProctor().find(x=>x.id===id);
+      if(!l) return alert('Log not found');
+      openModal(`<h3>Proctor Event</h3><pre style="white-space:pre-wrap;max-height:360px;overflow:auto">${escapeHtml(JSON.stringify(l, null, 2))}</pre><div class="modal-footer"><button class="btn ghost" id="p_close">Close</button></div>`, ()=>{
+        $('#p_close').addEventListener('click', closeModal);
+      });
+    }
+  });
+
+  /* ======================
+     Students list functions
+     ====================== */
+  $('#refreshStudents').addEventListener('click', renderStudents);
+  function renderStudents(){
+    const tbody = $('#studentsTable tbody'); tbody.innerHTML='';
+    const q = $('#studentSearch').value.trim().toLowerCase();
+    getUsers().forEach(u=>{
+      if(q && !(`${u.fullname} ${u.email}`).toLowerCase().includes(q)) return;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${escapeHtml(u.fullname)}</td><td>${escapeHtml(u.email)}</td><td>${escapeHtml(u.role)}</td><td><button class="btn ghost btn-view-stu" data-email="${escapeHtml(u.email)}">View</button></td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  $('#studentsTable tbody').addEventListener('click', (ev)=>{
+    const btn = ev.target.closest('button');
+    if(!btn) return;
+    if(btn.classList.contains('btn-view-stu')) {
+      const email = btn.dataset.email;
+      const u = (getUsers()||[]).find(x=>x.email===email);
+      if(!u) return alert('Student not found');
+      openModal(`<h3>${escapeHtml(u.fullname)}</h3><p>Email: ${escapeHtml(u.email)}</p><p>Role: ${escapeHtml(u.role)}</p><div class="modal-footer"><button class="btn primary" id="stu_close">Close</button></div>`, ()=>{
+        $('#stu_close').addEventListener('click', closeModal);
+      });
+    }
+  });
+
+  /* ======================
+     Import / Export JSON
+     ====================== */
+  $('#exportJSON').addEventListener('click', ()=>{
+    const payload = { questions: getQuestions(), exams: getExams(), proctorLogs: getProctor(), users: getUsers() };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'medex-data.json'; a.click(); URL.revokeObjectURL(url);
+    toast('Exported JSON');
+  });
+
+  $('#importJSON').addEventListener('click', ()=> $('#importFile').click());
+  $('#importFile').addEventListener('change', (e)=>{
+    const f = e.target.files && e.target.files[0]; if(!f) return;
+    const r = new FileReader();
+    r.onload = (ev)=> {
+      try{
+        const data = JSON.parse(ev.target.result);
+        if(Array.isArray(data.questions)) setQuestions(data.questions);
+        if(Array.isArray(data.exams)) setExams(data.exams);
+        if(Array.isArray(data.proctorLogs)) setProctor(data.proctorLogs);
+        if(Array.isArray(data.users)) localStorage.setItem(K.USERS, JSON.stringify(data.users));
+        renderQuestions(''); renderExams(); renderProctor(); populateExamFilter(); toast('Import completed');
+      }catch(err){
+        alert('Invalid JSON file'); console.error(err);
+      }
+    };
+    r.readAsText(f); e.target.value='';
+  });
+
+  /* ======================
+     Clear all (danger)
+     ====================== */
+  $('#btnClearAll').addEventListener('click', ()=>{
+    if(!confirm('Clear ALL app data from localStorage? This cannot be undone.')) return;
+    const keep = admin; localStorage.clear(); localStorage.setItem(K.LOGGED, JSON.stringify(keep));
+    toast('Cleared localStorage — reloading'); setTimeout(()=>location.reload(), 900);
+  });
+
+  /* ======================
+     Logout
+     ====================== */
+  $('#logoutBtn').addEventListener('click', ()=>{
+    if(confirm('Logout?')){ localStorage.removeItem(K.LOGGED); location.href = '../index.html'; }
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    localStorage.removeItem(K.LOGGED); // Clear logged-in info
+    window.location.href = 'index.html'; // redirect to login
+});
+
+
+  /* ======================
+     Utilities & Charts
+     ====================== */
+  function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  function downloadCSV(rows, filename){
+    const csv = rows.map(r => r.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' }); const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = filename; a.click(); URL.revokeObjectURL(url);
+  }
+
+  // small charts (canvas)
+  function drawPassRateChart(){
+    const ctx = document.getElementById('passRateChart').getContext('2d');
+    const results = getResults();
+    const pass = results.filter(r => Number(r.score) >= 50).length;
+    const fail = results.length - pass;
+    const w = ctx.canvas.width, h = ctx.canvas.height, cx = w/2, cy = h/2;
+    ctx.clearRect(0,0,w,h);
+    const total = Math.max(results.length,1);
+    const passAngle = (pass/total) * Math.PI * 2;
+    // pass arc
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.fillStyle = 'rgba(15,143,143,0.92)'; ctx.arc(cx,cy,60,0,passAngle); ctx.fill();
+    // fail arc
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.fillStyle = '#d63e3e'; ctx.arc(cx,cy,60,passAngle,Math.PI*2); ctx.fill();
+    // hole
+    ctx.beginPath(); ctx.fillStyle = '#fff'; ctx.arc(cx,cy,28,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#0b2b3a'; ctx.font='14px Arial'; ctx.textAlign='center'; ctx.fillText(`Pass: ${pass}`, cx, cy-6); ctx.fillText(`Fail: ${fail}`, cx, cy+16);
+  }
+
+  function drawAttemptsChart(){
+    const ctx = document.getElementById('attemptsChart').getContext('2d');
+    const results = getResults();
+    const byExam = {}; results.forEach(r => byExam[r.examTitle] = (byExam[r.examTitle]||0)+1);
+    const labels = Object.keys(byExam).slice(-6); const vals = labels.map(l => byExam[l]);
+    const w = ctx.canvas.width, h = ctx.canvas.height;
+    ctx.clearRect(0,0,w,h);
+    const max = Math.max(...vals,1); const barW = Math.floor(w / (labels.length || 1)) - 8;
+    labels.forEach((lab,i)=>{
+      const val = vals[i]; const barH = Math.round((val / max) * (h - 40));
+      const x = 10 + i*(barW+8);
+      ctx.fillStyle = 'rgba(13,74,161,0.95)'; ctx.fillRect(x, h-30-barH, barW, barH);
+      ctx.fillStyle = '#333'; ctx.font='11px Arial'; ctx.textAlign='center'; ctx.fillText(lab.length>8?lab.slice(0,8)+'...':lab, x+barW/2, h-10);
+    });
+  }
+
+  /* ======================
+     Modal helpers
+     ====================== */
+  function openModal(html, onOpen){ modalBox.innerHTML = html; modal.style.display = 'flex'; if(onOpen) onOpen(); }
+  function closeModal(){ modal.style.display = 'none'; modalBox.innerHTML = ''; }
+
+  // close modal on outside click
+  modal.addEventListener('click', (e)=>{ if(e.target === modal) closeModal(); });
+
+  /* ======================
+     initial rendering
+     ====================== */
+  renderQuestions(''); renderExams(); populateExamFilter(); renderProctor(); renderStudents(); loadOverview();
+
+  // Populate proctor exam filter (for convenience)
+  function populateProctorExamFilter(){ const sel = $('#proctorFilterExam'); sel.innerHTML = '<option value="">All exams</option>'; getExams().forEach(ex => sel.insertAdjacentHTML('beforeend', `<option value="${ex.id}">${escapeHtml(ex.examTitle)}</option>`)); }
+  populateProctorExamFilter();
+
+  // small helper to re-run key visuals quickly
+  window._admin_refresh = function(){ renderQuestions(''); renderExams(); renderProctor(); populateExamFilter(); loadOverview(); };
+
+})();
+
+</script>
+
 </body>
 </html>

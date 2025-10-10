@@ -1,149 +1,351 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Exam | Medical Exam System</title>
-  <link rel="stylesheet" href="../css/style.css" />
-  <style>
-    /* exam page specific styles (keeps it modern & focused) */
-    body { background:#f4f7fb; font-family: "Segoe UI", Tahoma, sans-serif; color:#222; }
-    header { background:#fff; border-bottom:1px solid #e6eef9; padding:12px 24px; display:flex; justify-content:space-between; align-items:center; }
-    header .logo { font-weight:700; color:#0d47a1; }
-    .exam-wrap { width:90%; max-width:980px; margin:28px auto; }
-    .exam-top { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px; }
-    .exam-top .info { font-size:0.95rem; color:#444; }
-    .timer { background:#0d47a1; color:#fff; padding:10px 16px; border-radius:8px; font-weight:700; }
-    .progress-bar { height:10px; background:#e9f2ff; border-radius:6px; overflow:hidden; margin:14px 0; }
-    .progress { height:100%; width:0%; background:#00b4d8; transition:width .35s ease; }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Exam | Medical Exam System</title>
+<style>
+  body { background:#f4f7fb; font-family: "Segoe UI", Tahoma, sans-serif; color:#222; margin:0; padding:0;}
+  header { background:#fff; border-bottom:1px solid #e6eef9; padding:12px 24px; display:flex; justify-content:space-between; align-items:center; }
+  header .logo { font-weight:700; color:#0d47a1; }
 
-    .question-card { background:#fff; padding:22px; border-radius:12px; box-shadow:0 8px 24px rgba(13,71,161,0.06); }
-    .question-card h3 { margin-bottom:8px; color:#0d47a1; }
-    .question-text { font-size:1rem; margin-bottom:14px; color:#222; }
+  .exam-wrap { width:90%; max-width:1080px; margin:28px auto; display:flex; flex-direction:column; gap:18px; }
+  .exam-top { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px; }
+  .exam-top .info { font-size:0.95rem; color:#444; }
+  .timer { background:#0d47a1; color:#fff; padding:10px 16px; border-radius:8px; font-weight:700; }
+  .progress-bar { height:10px; background:#e9f2ff; border-radius:6px; overflow:hidden; margin-top:6px; }
+  .progress { height:100%; width:0%; background:linear-gradient(90deg,#0fa3a3,#2e7d32); transition:width .35s ease; }
 
-    .options label { display:block; padding:12px; background:#fbfdff; border-radius:8px; margin-bottom:10px; cursor:pointer; border:1px solid #eaf5ff; transition:all .18s; }
-    .options input[type="radio"]{ margin-right:10px; }
-    .options label:hover { transform:translateY(-2px); box-shadow:0 6px 18px rgba(13,71,161,0.06); }
+  .exam-main { display:flex; gap:16px; }
+  .exam-questions { flex:3; display:flex; flex-direction:column; gap:12px; }
+  .question-card { background:#fff; padding:22px; border-radius:12px; box-shadow:0 8px 24px rgba(13,71,161,0.06); }
+  .question-card h3 { margin-bottom:8px; color:#0d47a1; }
+  .question-text { font-size:1rem; margin-bottom:14px; color:#222; }
+  .options label { display:block; padding:12px; background:#fbfdff; border-radius:8px; margin-bottom:10px; cursor:pointer; border:1px solid #eaf5ff; transition:all .18s; }
+  .options input[type="radio"]{ margin-right:10px; }
+  .options label:hover { transform:translateY(-2px); box-shadow:0 6px 18px rgba(13,71,161,0.06); }
+  .options label.selected { background:linear-gradient(90deg, rgba(15,143,143,0.08), rgba(46,139,87,0.06)); border-color: rgba(15,143,143,0.12); }
 
-    .nav-actions { display:flex; justify-content:space-between; gap:10px; margin-top:18px; }
-    .btn { padding:10px 18px; border-radius:8px; border:none; cursor:pointer; font-weight:600; }
-    .btn.primary { background:#0d47a1; color:#fff; }
-    .btn.secondary { background:#fff; color:#0d47a1; border:1px solid #cfe2ff; }
-    .btn.ghost { background:transparent; color:#666; border:1px solid #eee; }
+  .nav-actions { display:flex; justify-content:space-between; gap:10px; margin-top:18px; align-items:center; }
+  .btn { padding:10px 18px; border-radius:8px; border:none; cursor:pointer; font-weight:600; }
+  .btn.primary { background:#0d47a1; color:#fff; }
+  .btn.secondary { background:#fff; color:#0d47a1; border:1px solid #cfe2ff; }
+  .btn.ghost { background:transparent; color:#666; border:1px solid #eee; }
 
-    .result-wrap { background:#fff; padding:22px; border-radius:12px; box-shadow:0 8px 24px rgba(13,71,161,0.06); }
-    .result-summary { display:flex; gap:18px; align-items:center; margin-bottom:18px; }
-    .result-summary .big { font-size:2.6rem; color:#0d47a1; font-weight:800; }
-    .review-item { border-top:1px dashed #eef6ff; padding:12px 0; }
-    .review-item h4 { margin-bottom:8px; color:#0d47a1; }
-    .correct { color: #1b7a3a; font-weight:700; }
-    .wrong { color: #d62828; font-weight:700; }
-    .small-meta { font-size:0.85rem; color:#666; }
+  /* question status panel */
+  .question-status-panel { flex:1; background:#fff; padding:12px; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.05); height:max-content; }
+  .question-status-panel h4 { margin-bottom:8px; color:#0d47a1; }
+  #questionStatus { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; }
+  .question-status-item { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:0.8rem; border:1px solid #ccc; transition:all 0.2s; }
+  .question-status-item.answered { background:#2e7d32; color:#fff; border:none; }
+  .question-status-item.marked { background:#ffa500; color:#fff; border:none; }
+  .question-status-item.unanswered { background:#eee; color:#666; }
+  .question-status-item:hover { transform:scale(1.1); }
 
-    /* center consent if it's present */
-    .consent-modal, .policy-modal { z-index:99999; }
-  </style>
+  /* result styling */
+  .result-wrap { display:flex; flex-direction:column; gap:24px; background:#fdfdfd; padding:24px; border-radius:16px; box-shadow:0 12px 28px rgba(0,0,0,0.1); }
+  .result-summary { display:flex; align-items:center; gap:24px; }
+  .result-summary .big { font-size:3rem; font-weight:800; color:#0d47a1; position:relative; width:100px; height:100px; display:flex; align-items:center; justify-content:center; border-radius:50%; background: conic-gradient(#2e7d32 calc(var(--pct) * 1%), #ddd 0); }
+  .review-item { background:#f4f7fb; padding:16px; border-radius:12px; margin-bottom:12px; box-shadow:0 4px 16px rgba(0,0,0,0.03); }
+  .review-item h4 { font-size:1rem; margin-bottom:6px; color:#0d47a1; }
+  .review-item .correct { color:#1b7a3a; font-weight:700; }
+  .review-item .wrong { color:#d62828; font-weight:700; }
+
+  /* consent modal */
+  .consent-modal, .policy-modal { position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(2,6,23,0.6); z-index:99999; }
+  .consent-content, .policy-content { background:#fff; padding:18px; border-radius:12px; width:90%; max-width:720px; }
+</style>
 </head>
 <body>
-  <header>
-    <div class="logo">MedExam<span>System</span></div>
+<header>
+  <div class="logo">MedExam<span>System</span></div>
+  <div>
+    <span id="studentShort" class="small-meta"></span>
+    <a id="exitExam" class="btn ghost" style="margin-left:10px">Exit Exam</a>
+  </div>
+</header>
+
+<!-- Consent Modal -->
+<div id="consentModal" class="consent-modal">
+  <div class="consent-content">
+    <h2>📜 Exam Monitoring Consent</h2>
+    <p>Please review and accept monitoring before starting the exam:</p>
+    <ul>
+      <li>📸 Periodic webcam snapshots for proctoring (if enabled).</li>
+      <li>🔐 Tab switching and developer tools attempts are logged.</li>
+    </ul>
+    <label style="display:flex;align-items:center;gap:8px;margin-top:8px">
+      <input type="checkbox" id="consentCheckbox" /> I agree to the monitoring policy.
+    </label>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+      <button id="viewPolicyBtn" class="btn secondary">View Policy</button>
+      <button id="startExamBtn" class="btn primary" disabled>Start Exam</button>
+    </div>
+  </div>
+</div>
+
+<div id="policyModal" class="policy-modal">
+  <div class="policy-content">
+    <h3>Exam Monitoring Policy</h3>
+    <p>By taking this exam you consent to limited proctoring per policy.</p>
+    <div style="display:flex;justify-content:flex-end;margin-top:12px">
+      <button id="closePolicy" class="btn primary">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Main Exam -->
+<div class="exam-wrap" id="examContainer" style="display:none;">
+  <div class="exam-top">
+    <div class="info">
+      <div id="examTitle">Medical Fundamentals</div>
+      <div class="small-meta">Question <span id="currentNumber">1</span> / <span id="totalNumber">0</span></div>
+    </div>
     <div>
-      <span id="studentShort" class="small-meta"></span>
-      <a id="exitExam" class="btn ghost" style="margin-left:10px">Exit Exam</a>
-    </div>
-  </header>
-
-  <!-- ====== Consent modal (inserted here so it's top-of-body) ======
-       If you already have consent modal elsewhere, ensure IDs match:
-       #consentModal, #consentCheckbox, #startExamBtn, #viewPolicyBtn, #policyModal, #closePolicy
-  -->
-  <!-- ================= EXAM CONSENT MODAL ================= -->
-  <div id="consentModal" class="consent-modal" style="display:flex;">
-    <div class="consent-content">
-      <h2>📜 Exam Monitoring Consent</h2>
-      <p>Please review and accept the following terms before starting the exam:</p>
-      <ul>
-        <li>📸 Your webcam will capture periodic snapshots for identity verification and monitoring.</li>
-        <li>🔐 Tab switching, copying/pasting, right-clicking, or opening developer tools will be logged.</li>
-        <li>📂 Data is used only for academic integrity and will be deleted after review.</li>
-      </ul>
-      <label class="consent-check">
-        <input type="checkbox" id="consentCheckbox" />
-        I have read and agree to the Exam Monitoring Policy.
-      </label>
-      <div class="consent-buttons" style="display:flex;gap:10px;justify-content:flex-end;">
-        <button id="viewPolicyBtn" class="btn secondary">📑 View Full Policy</button>
-        <button id="startExamBtn" class="btn primary" disabled>✅ I Agree & Start Exam</button>
-      </div>
+      <div class="timer" id="timerDisplay">--:--</div>
+      <div class="progress-bar"><div id="progressBar" class="progress"></div></div>
     </div>
   </div>
 
-  <!-- ================= FULL POLICY MODAL ================= -->
-  <div id="policyModal" class="policy-modal" style="display:none;">
-    <div class="policy-content">
-      <span id="closePolicy" class="close">&times;</span>
-      <h2>Exam Monitoring Policy</h2>
-      <p>This exam uses proctoring to protect integrity. The following may be collected:</p>
-      <ul>
-        <li>📷 Periodic webcam snapshots</li>
-        <li>🧭 Browser visibility events (tab switches, blur/focus)</li>
-        <li>⌨️ Developer tools attempts, copy/paste, right-click events</li>
-      </ul>
-      <p>Data will be retained only for evaluation and deleted after investigation. By continuing you consent to this monitoring.</p>
-    </div>
-  </div>
-
-  <!-- ====== MAIN EXAM AREA ====== -->
-  <div class="exam-wrap" id="examContainer" style="display:none;">
-    <div class="exam-top">
-      <div class="info">
-        <div id="examTitle">Medical Fundamentals</div>
-        <div class="small-meta">Question <span id="currentNumber">1</span> / <span id="totalNumber">0</span></div>
-      </div>
-      <div>
-        <div class="timer" id="timerDisplay">--:--</div>
-        <div style="height:8px"></div>
-        <div class="progress-bar"><div id="progressBar" class="progress"></div></div>
-      </div>
-    </div>
-
-    <!-- question card -->
-    <div id="questionCard" class="question-card"></div>
-
-    <!-- navigation -->
-    <div class="nav-actions" style="margin-top:18px;">
-      <button id="prevBtn" class="btn secondary">⬅ Previous</button>
-      <div style="display:flex; gap:10px;">
-        <button id="markBtn" class="btn ghost">☆ Mark</button>
-        <button id="nextBtn" class="btn primary">Next ➡</button>
-        <button id="submitBtn" class="btn primary" style="display:none">Submit Exam</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- result section (hidden initially) -->
-  <div class="exam-wrap" id="resultContainer" style="display:none;">
-    <div class="result-wrap">
-      <div class="result-summary">
-        <div class="big" id="resultScore">0%</div>
-        <div>
-          <div class="small-meta">Exam: <strong id="resultTitle"></strong></div>
-          <div class="small-meta">Correct: <strong id="resultCorrect"></strong> / <span id="resultTotal"></span></div>
-          <div class="small-meta">Date: <span id="resultDate"></span></div>
+  <div class="exam-main">
+    <div class="exam-questions">
+      <div id="questionCard" class="question-card"></div>
+      <div class="nav-actions">
+        <div style="display:flex;gap:8px">
+          <button id="prevBtn" class="btn secondary">⬅ Previous</button>
+          <button id="nextBtn" class="btn primary">Next ➡</button>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button id="markBtn" class="btn ghost">☆ Mark</button>
+          <button id="submitBtn" class="btn primary">Submit Exam</button>
         </div>
       </div>
+    </div>
 
-      <div id="reviewList"></div>
-
-      <div style="margin-top:18px; text-align:right;">
-        <button id="backToDashboard" class="btn secondary">Back to Dashboard</button>
-      </div>
+    <div class="question-status-panel">
+      <h4>Questions</h4>
+      <div id="questionStatus"></div>
     </div>
   </div>
+</div>
 
-  <script src="../js/proctor.js"></script>
-  <script src="../js/security.js"></script>
-  <script src="../js/consent.js"></script>  <!-- updated version (see next section) -->
-  <script src="../js/exam.js"></script>
+<!-- Results -->
+<div class="exam-wrap" id="resultContainer" style="display:none;">
+  <div class="result-wrap">
+    <div class="result-summary">
+      <div class="big" id="resultScore"></div>
+      <div>
+        <div class="small-meta">Exam: <strong id="resultTitle"></strong></div>
+        <div class="small-meta">Correct: <strong id="resultCorrect"></strong> / <span id="resultTotal"></span></div>
+        <div class="small-meta">Date: <span id="resultDate"></span></div>
+      </div>
+    </div>
+    <div id="reviewList"></div>
+    <div style="margin-top:18px; text-align:right;">
+      <button id="backToDashboard" class="btn secondary">Back to Dashboard</button>
+      <button id="retakeBtn" class="btn ghost" style="margin-left:8px;display:none">Retake</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const KEY = { QUESTIONS:'questions', EXAMS:'exams', RESULTS:'examResults' };
+  const $ = s => document.querySelector(s);
+  const $$ = s => Array.from(document.querySelectorAll(s));
+  const uid = () => 'id'+Math.random().toString(36).slice(2,9);
+  const nowISO = ()=>new Date().toISOString();
+  const formatDate = ts=>new Date(ts).toLocaleString();
+  
+  const getUser = ()=>{
+    let u = JSON.parse(localStorage.getItem('loggedInUser')||'null');
+    if(!u){ u={fullname:'Student User', email:'student@example.com'}; localStorage.setItem('loggedInUser',JSON.stringify(u)); }
+    return u;
+  };
+
+  async function loadQuestionsPool(){
+    const local = JSON.parse(localStorage.getItem(KEY.QUESTIONS)||'null');
+    if(Array.isArray(local)&&local.length) return local;
+    try{
+      const res = await fetch('../data/questions.json');
+      if(res.ok){
+        const json = await res.json();
+        if(Array.isArray(json)&&json.length){ localStorage.setItem(KEY.QUESTIONS, JSON.stringify(json)); return json; }
+      }
+    }catch(e){ console.warn('Could not fetch questions.json', e); }
+    return [];
+  }
+
+  function getParam(name){ return new URL(window.location.href).searchParams.get(name); }
+  function normalizeQuestions(raw){
+    return raw.map(q=>{
+      const opts=[];
+      if(Array.isArray(q.options)&&q.options.length) opts.push(...q.options);
+      else ['optionA','optionB','optionC','optionD','a','b','c','d'].forEach(k=>{ if(q[k]) opts.push(q[k]); });
+      let correct=q.correctAnswer||q.correctAnswerText||q.correct||q.answer;
+      if(typeof correct==='string'&&/^[A-D]$/i.test(correct)&&opts.length){
+        const idx={'A':0,'B':1,'C':2,'D':3}[correct.toUpperCase()];
+        correct=opts[idx]||correct;
+      }
+      return { id:String(q.id||q._id||uid()), question:q.question||q.q||'Question missing', options:opts.length?opts:['Option A','Option B','Option C','Option D'], correctText:correct||'', examTitle:q.examTitle||q.exam||q.category||'Default Exam'};
+    });
+  }
+
+  const user = getUser(); $('#studentShort').textContent=user.fullname||user.email||'Student';
+
+  let questions=[], examQuestions=[], examMeta=null, examTitleParam=decodeURIComponent(getParam('examTitle')||'').trim(), examStartTime=null, examDurationMin=60;
+  let currentIndex=0, answers={}, markedForReview=new Set(), timerInterval=null, expireAt=null, finalExamTitle='';
+
+  (async function init(){
+    const pool = await loadQuestionsPool();
+    questions = normalizeQuestions(pool);
+    const allExamTitles=[...new Set(questions.map(q=>q.examTitle||'Default Exam'))];
+    if(!examTitleParam) examTitleParam=allExamTitles.length?allExamTitles[0]:'Default Exam';
+    finalExamTitle = examTitleParam;
+
+    const examsMeta=JSON.parse(localStorage.getItem(KEY.EXAMS)||'[]');
+    examMeta=examsMeta.find(e=>String(e.examTitle)===String(examTitleParam)||String(e.id)===String(examTitleParam))||null;
+    if(examMeta&&examMeta.durationMinutes) examDurationMin=Number(examMeta.durationMinutes);
+
+    examQuestions=questions.filter(q=>String(q.examTitle||'Default Exam')===String(examTitleParam));
+    if(!examQuestions.length){ alert('No questions found for exam: '+examTitleParam); $('#examTitle').textContent='Exam not found'; return; }
+    $('#examTitle').textContent=examTitleParam;
+    $('#totalNumber').textContent=examQuestions.length;
+
+    const savedKey = `answers_${sanitize(examTitleParam)}_${user.email}`;
+    answers=JSON.parse(localStorage.getItem(savedKey)||'{}');
+    const existingAttempt=findLatestAttempt();
+    if(existingAttempt&&!existingAttempt.autoSubmitted){ showResult(existingAttempt); return; }
+
+    const consentKey=`consent_${user.email}_${examTitleParam}`;
+    if(!localStorage.getItem(consentKey)){
+      $('#consentModal').style.display='flex';
+      $('#consentCheckbox').checked=false;
+      $('#startExamBtn').disabled=true;
+      $('#consentCheckbox').addEventListener('change', e=>$('#startExamBtn').disabled=!e.target.checked);
+      $('#viewPolicyBtn').addEventListener('click', ()=>$('#policyModal').style.display='flex');
+      $('#closePolicy').addEventListener('click', ()=>$('#policyModal').style.display='none');
+      $('#startExamBtn').addEventListener('click', ()=>{
+        localStorage.setItem(consentKey,'1'); $('#consentModal').style.display='none'; startExamFlow();
+      });
+    } else startExamFlow();
+  })();
+
+  function sanitize(s){ return String(s).replace(/\s+/g,'_').replace(/[^A-Za-z0-9_\-]/g,''); }
+  function answersKey(){ return `answers_${sanitize(examTitleParam)}_${user.email}`; }
+  function timerKey(){ return `timer_${sanitize(examTitleParam)}_${user.email}`; }
+
+  function startExamFlow(){
+    $('#examContainer').style.display='block'; $('#resultContainer').style.display='none';
+    const stored=localStorage.getItem(timerKey());
+    expireAt=stored?Number(stored):Date.now()+examDurationMin*60*1000;
+    localStorage.setItem(timerKey(), String(expireAt));
+    updateTimer(); timerInterval=setInterval(updateTimer,1000);
+    currentIndex=0; renderQuestion(currentIndex);
+    $('#prevBtn').addEventListener('click',()=>{ if(currentIndex>0){ currentIndex--; renderQuestion(currentIndex); }});
+    $('#nextBtn').addEventListener('click',()=>{ if(currentIndex<examQuestions.length-1){ currentIndex++; renderQuestion(currentIndex); }});
+    $('#markBtn').addEventListener('click', onMark);
+    $('#submitBtn').addEventListener('click', onSubmitClicked);
+    $('#exitExam').addEventListener('click',()=>{ if(confirm('Exit exam and return to dashboard?')) window.location.href='../pages/student-dashboard.html'; });
+  }
+
+  function updateTimer(){
+    const rem=expireAt-Date.now();
+    if(rem<=0){ $('#timerDisplay').textContent='00:00:00'; clearInterval(timerInterval); handleSubmit(true); return; }
+    const hrs=Math.floor(rem/(1000*60*60)); const mins=Math.floor((rem/(1000*60))%60); const secs=Math.floor((rem/1000)%60);
+    $('#timerDisplay').textContent=`${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+    const totalMs=examDurationMin*60*1000; const passed=totalMs-(expireAt-Date.now());
+    const pct=Math.max(0, Math.min(100, Math.round((passed/totalMs)*100)));
+    $('#progressBar').style.width=pct+'%';
+  }
+
+  function renderQuestion(idx){
+    const q=examQuestions[idx]; if(!q) return;
+    $('#currentNumber').textContent=idx+1;
+    $('#totalNumber').textContent=examQuestions.length;
+    const card=$('#questionCard'); card.innerHTML='';
+    const h=document.createElement('h3'); h.textContent=`Question ${idx+1}`;
+    const qt=document.createElement('div'); qt.className='question-text'; qt.textContent=q.question;
+    const opts=document.createElement('div'); opts.className='options';
+    q.options.forEach(opt=>{
+      const label=document.createElement('label');
+      const inp=document.createElement('input'); inp.type='radio'; inp.name='answer'; inp.value=opt;
+      if(answers[q.id]===opt) inp.checked=true;
+      inp.addEventListener('change', e=>{ answers[q.id]=e.target.value; localStorage.setItem(answersKey(), JSON.stringify(answers)); renderQuestionStatus(); });
+      label.appendChild(inp); label.appendChild(document.createTextNode(opt));
+      if(answers[q.id]===opt) label.classList.add('selected');
+      opts.appendChild(label);
+    });
+    card.appendChild(h); card.appendChild(qt); card.appendChild(opts);
+    renderQuestionStatus();
+  }
+
+  function onMark(){
+    const q=examQuestions[currentIndex];
+    if(markedForReview.has(q.id)) markedForReview.delete(q.id);
+    else markedForReview.add(q.id);
+    renderQuestionStatus();
+  }
+
+  function renderQuestionStatus(){
+    const container=$('#questionStatus'); container.innerHTML='';
+    examQuestions.forEach((q,i)=>{
+      const div=document.createElement('div'); div.className='question-status-item';
+      div.textContent=i+1;
+      if(markedForReview.has(q.id)) div.classList.add('marked');
+      else if(answers[q.id]) div.classList.add('answered');
+      else div.classList.add('unanswered');
+      div.addEventListener('click', ()=>{ currentIndex=i; renderQuestion(currentIndex); });
+      container.appendChild(div);
+    });
+  }
+
+  function onSubmitClicked(){ if(confirm('Submit exam now?')) handleSubmit(false); }
+
+  function handleSubmit(auto=false){
+    clearInterval(timerInterval);
+    $('#examContainer').style.display='none';
+    const total=examQuestions.length;
+    let correct=0;
+    const reviewList=[];
+    examQuestions.forEach(q=>{
+      const userAns=answers[q.id]||'';
+      const isCorrect=userAns.trim()===q.correctText.trim();
+      if(isCorrect) correct++;
+      reviewList.push({q:q.question, user:userAns, correct:q.correctText, isCorrect});
+    });
+    const attempt={id:uid(), examTitle:finalExamTitle, timestamp:nowISO(), score:Math.round(correct/total*100), correct, total, reviewList, autoSubmitted:auto};
+    const stored=JSON.parse(localStorage.getItem(KEY.RESULTS)||'[]'); stored.push(attempt); localStorage.setItem(KEY.RESULTS, JSON.stringify(stored));
+    showResult(attempt);
+  }
+
+  function findLatestAttempt(){
+    const stored=JSON.parse(localStorage.getItem(KEY.RESULTS)||'[]');
+    return stored.filter(a=>a.examTitle===finalExamTitle).sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp))[0]||null;
+  }
+
+  function showResult(attempt){
+    $('#resultContainer').style.display='block';
+    $('#resultTitle').textContent=attempt.examTitle;
+    $('#resultCorrect').textContent=attempt.correct;
+    $('#resultTotal').textContent=attempt.total;
+    $('#resultDate').textContent=formatDate(attempt.timestamp);
+    const pct=attempt.score; $('#resultScore').style.setProperty('--pct', pct); $('#resultScore').textContent=pct+'%';
+
+    const rl=$('#reviewList'); rl.innerHTML='';
+    attempt.reviewList.forEach(item=>{
+      const div=document.createElement('div'); div.className='review-item';
+      const h=document.createElement('h4'); h.textContent=item.q;
+      const ans=document.createElement('div'); ans.innerHTML=`Your Answer: <span class="${item.isCorrect?'correct':'wrong'}">${item.user||'---'}</span>`;
+      const cor=document.createElement('div'); cor.innerHTML=`Correct Answer: <strong>${item.correct}</strong>`;
+      div.appendChild(h); div.appendChild(ans); div.appendChild(cor);
+      rl.appendChild(div);
+    });
+    $('#backToDashboard').onclick=()=>window.location.href='../pages/student-dashboard.html';
+    const prevAttempt=findLatestAttempt();
+    if(prevAttempt&&prevAttempt.total>0){ $('#retakeBtn').style.display='inline-block'; $('#retakeBtn').onclick=()=>{ answers={}; markedForReview=new Set(); localStorage.removeItem(answersKey()); startExamFlow(); $('#retakeBtn').style.display='none'; };}
+  }
+})();
+</script>
 </body>
 </html>

@@ -182,6 +182,8 @@ document.getElementById("modalClose")?.addEventListener("click", () => {
   document.getElementById("proctorModal").style.display = "none";
 });
 
+
+
 document.getElementById("proctorRefresh")?.addEventListener("click", renderProctorLogs);
 document.getElementById("clearProctorLogs")?.addEventListener("click", () => {
   if (!confirm("Clear all proctor logs? This cannot be undone.")) return;
@@ -189,6 +191,10 @@ document.getElementById("clearProctorLogs")?.addEventListener("click", () => {
   renderProctorLogs();
 });
 
+
+
 // auto-render on load of admin dashboard
 renderProctorLogs();
+
+
 
