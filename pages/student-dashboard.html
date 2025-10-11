@@ -108,11 +108,14 @@
   $('#studentName').textContent = user.fullname || user.email;
 
   function loadQuestions(){ return JSON.parse(localStorage.getItem(KEY.QUESTIONS)||'[]'); }
-  function loadResults(){ return JSON.parse(localStorage.getItem(KEY.RESULTS)||'[]').filter(r=>r.studentEmail===user.email||true); }
-
   
 
-
+  function loadResults(){
+    const allResults = JSON.parse(localStorage.getItem(KEY.RESULTS) || '[]');
+    if(!user || !user.email) return [];  // safety check
+    // Filter only results for logged-in student
+    return allResults.filter(r => r.studentEmail === user.email);
+}
   function renderStats(){
     const results=loadResults();
     const total=results.length;

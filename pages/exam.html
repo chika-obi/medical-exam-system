@@ -150,6 +150,51 @@
 
 <script>
 (function(){
+  // === PROCTORING FEATURE START === //
+async function startProctoring(examTitle, student){
+  const video = document.createElement('video');
+  video.autoplay = true;
+  video.muted = true;
+  video.style.display = 'none';
+  document.body.appendChild(video);
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    video.srcObject = stream;
+  } catch (err) {
+    console.warn('Camera access denied:', err);
+    return;
+  }
+
+  function captureSnapshot(){
+    const canvas = document.createElement('canvas');
+    canvas.width = 320;
+    canvas.height = 240;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const imgData = canvas.toDataURL('image/png');
+    
+    const logEntry = {
+      studentEmail: student.email,
+      examTitle: examTitle,
+      timestamp: new Date().toISOString(),
+      image: imgData
+    };
+
+    const allLogs = JSON.parse(localStorage.getItem('proctorLogs') || '[]');
+    allLogs.push(logEntry);
+    localStorage.setItem('proctorLogs', JSON.stringify(allLogs));
+  }
+
+  // Capture every 45 seconds
+  captureSnapshot(); // first snapshot immediately
+  const interval = setInterval(captureSnapshot, 45000);
+
+  // Stop capturing when exam ends or student leaves page
+  window.addEventListener('beforeunload', ()=>clearInterval(interval));
+}
+// === PROCTORING FEATURE END === //
+
   const KEY = { QUESTIONS:'questions', EXAMS:'exams', RESULTS:'examResults' };
   const $ = s => document.querySelector(s);
   const $$ = s => Array.from(document.querySelectorAll(s));
@@ -236,6 +281,8 @@
   function timerKey(){ return `timer_${sanitize(examTitleParam)}_${user.email}`; }
 
   function startExamFlow(){
+    startProctoring(finalExamTitle, user);
+
     $('#examContainer').style.display='block'; $('#resultContainer').style.display='none';
     const stored=localStorage.getItem(timerKey());
     expireAt=stored?Number(stored):Date.now()+examDurationMin*60*1000;
@@ -314,11 +361,21 @@
       if(isCorrect) correct++;
       reviewList.push({q:q.question, user:userAns, correct:q.correctText, isCorrect});
     });
-    const attempt={id:uid(), examTitle:finalExamTitle, timestamp:nowISO(), score:Math.round(correct/total*100), correct, total, reviewList, autoSubmitted:auto};
+     
     
-    
-    const stored=JSON.parse(localStorage.getItem(KEY.RESULTS)||'[]'); stored.push(attempt); localStorage.setItem(KEY.RESULTS, JSON.stringify(stored));
-    showResult(attempt);
+    const attempt = {
+    id: uid(),
+    examTitle: finalExamTitle,
+    timestamp: nowISO(),
+    score: Math.round(correct / total * 100),
+    correct,
+    total,
+    reviewList,
+    autoSubmitted: auto,
+    studentEmail: (user && user.email) ? user.email : 'unknown@student.com'  // safe fallback
+};
+const stored=JSON.parse(localStorage.getItem(KEY.RESULTS)||'[]'); stored.push(attempt); localStorage.setItem(KEY.RESULTS, JSON.stringify(stored));
+showResult(attempt);
   }
 
   function findLatestAttempt(){

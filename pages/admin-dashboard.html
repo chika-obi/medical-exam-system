@@ -210,6 +210,10 @@
           <button id="refreshProctor" class="btn ghost">Apply</button>
           <button id="exportProctorCSV" class="btn ghost">Export CSV</button>
         </div>
+<div class="card">
+  <h2>Proctor Logs</h2>
+  <div id="proctorLogContainer" style="max-height:400px;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;"></div>
+</div>
 
         <div style="margin-top:12px;overflow:auto">
           <table id="proctorTable"><thead><tr><th>Time</th><th>Type</th><th>Student</th><th>Exam</th><th></th></tr></thead><tbody></tbody></table>
@@ -255,6 +259,36 @@
    =========================== */
 
 (function(){
+(function(){
+  function loadProctorLogs(){
+    const container = document.getElementById('proctorLogContainer');
+    const logs = JSON.parse(localStorage.getItem('proctorLogs') || '[]');
+    container.innerHTML = '';
+
+    if(!logs.length){
+      container.innerHTML = '<p style="color:#777;">No proctor logs available yet.</p>';
+      return;
+    }
+
+    logs.slice().reverse().forEach(log=>{
+      const div = document.createElement('div');
+      div.style.border='1px solid #ccc';
+      div.style.borderRadius='8px';
+      div.style.padding='6px';
+      div.style.background='#f9f9f9';
+      div.innerHTML = `
+        <img src="${log.image}" alt="Snapshot" style="width:100%;border-radius:6px;">
+        <small>${log.studentEmail}<br>${new Date(log.timestamp).toLocaleString()}</small>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  loadProctorLogs();
+  setInterval(loadProctorLogs, 15000); // auto-refresh every 15s
+})();
+
+
   // DOM helpers
   const $ = s => document.querySelector(s);
   const $$ = s => Array.from(document.querySelectorAll(s));
