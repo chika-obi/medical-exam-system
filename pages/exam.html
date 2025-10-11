@@ -315,6 +315,8 @@
       reviewList.push({q:q.question, user:userAns, correct:q.correctText, isCorrect});
     });
     const attempt={id:uid(), examTitle:finalExamTitle, timestamp:nowISO(), score:Math.round(correct/total*100), correct, total, reviewList, autoSubmitted:auto};
+    
+    
     const stored=JSON.parse(localStorage.getItem(KEY.RESULTS)||'[]'); stored.push(attempt); localStorage.setItem(KEY.RESULTS, JSON.stringify(stored));
     showResult(attempt);
   }

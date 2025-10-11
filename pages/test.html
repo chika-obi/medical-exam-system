@@ -1,0 +1,887 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Student Dashboard — MedEx</title>
+<meta name="description" content="Student dashboard for MedEx Online Examination System — take exams, view results, download certificate." />
+<style>
+  /* ----------------- Reset & Vars ----------------- */
+  :root{
+    --navy: #082a66;
+    --teal: #0fa3a3;
+    --muted: #556170;
+    --accent: #ffd54f;
+    --bg: #f6f8fb;
+    --card: #fff;
+    --glass: rgba(255,255,255,0.6);
+    --radius: 12px;
+    --maxw: 1200px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background: linear-gradient(180deg,#f7fbff 0%, var(--bg) 100%);
+    color:#06223a;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    line-height:1.45;
+  }
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit}
+
+  /* ----------------- Layout ----------------- */
+  .wrap{display:flex;min-height:100vh;max-width:1400px;margin:28px auto;gap:20px;padding:0 18px}
+  nav.sidebar{
+    width:280px;background:var(--card);border-radius:14px;padding:18px;box-shadow:0 12px 40px rgba(8,18,40,0.06);
+    flex-shrink:0;position:sticky;top:24px;height:calc(100vh - 48px);overflow:auto;
+  }
+  main.content{flex:1}
+
+  #subject-select {
+  text-align: center;
+  margin: 30px 0;
+}
+
+.subject-dropdown {
+  padding: 12px 20px;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  border: 2px solid #0d47a1;
+  color: #0d47a1;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.subject-dropdown:hover {
+  background: #0d47a1;
+  color: #fff;
+}
+
+
+  /* ----------------- Sidebar ----------------- */
+  .profile{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+  .avatar{width:62px;height:62px;border-radius:10px;background:linear-gradient(90deg,var(--teal),#2e7d32);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:20px;box-shadow:0 8px 24px rgba(15,143,143,0.08)}
+  .pinfo{flex:1}
+  .pinfo h3{font-size:1.05rem;color:var(--navy)}
+  .pinfo p{font-size:0.88rem;color:var(--muted)}
+
+  .side-section{margin-top:18px}
+  .side-section h4{font-size:0.9rem;color:var(--muted);margin-bottom:8px}
+  .exam-list{display:flex;flex-direction:column;gap:8px}
+  .exam-item{padding:10px;border-radius:10px;background:linear-gradient(180deg,#fff,#fbfdff);cursor:pointer;border:1px solid #eef6ff;transition:transform .18s,box-shadow .18s;display:flex;justify-content:space-between;align-items:center}
+  .exam-item:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(8,20,50,0.04)}
+  .exam-item.active{border-color:var(--teal);box-shadow:0 12px 30px rgba(15,143,143,0.06)}
+
+  .small{font-size:0.85rem;color:var(--muted)}
+  .btn{padding:10px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
+  .btn.primary{background:linear-gradient(90deg,var(--teal),#2e7d32);color:#fff}
+  .btn.ghost{background:transparent;border:1px solid #eef6ff;color:var(--navy)}
+
+  /* ----------------- Main header ----------------- */
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+  .welcome h2{font-size:1.25rem;color:var(--navy)}
+  .controls{display:flex;gap:8px;align-items:center}
+
+  /* ----------------- Exam Panel ----------------- */
+  .panel{background:var(--card);padding:18px;border-radius:14px;box-shadow:0 12px 40px rgba(8,18,40,0.06);margin-bottom:18px}
+  .exam-meta{display:flex;justify-content:space-between;gap:12px;align-items:center}
+  .exam-title{font-weight:800;color:var(--navy);font-size:1.15rem}
+  .timer{font-weight:800;color:#d63e3e}
+
+  /* progress bar */
+  .progress-wrap{height:10px;background:#eef6ff;border-radius:999px;margin-top:12px;overflow:hidden}
+  .progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--teal),#2e7d32);transition:width .28s}
+
+  /* question list (one-page) */
+  .questions{margin-top:18px;display:flex;flex-direction:column;gap:14px}
+  .qcard{background:#fff;padding:14px;border-radius:12px;border:1px solid #f1f7ff;box-shadow:0 8px 30px rgba(8,18,40,0.03);transform-origin:top center;transition:transform .25s,box-shadow .25s}
+  .qcard:hover{transform:translateY(-6px);box-shadow:0 18px 50px rgba(8,18,40,0.06)}
+  .qhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px}
+  .qtext{font-weight:700;color:var(--navy);margin-bottom:8px}
+  .options{display:flex;flex-direction:column;gap:8px}
+  .option{display:flex;gap:12px;align-items:flex-start;padding:10px;border-radius:10px;border:1px solid #eef6ff;cursor:pointer;transition:background .18s,transform .12s}
+  .option input{margin-top:3px}
+  .option:hover{background:#f8fbff;transform:translateY(-2px)}
+  .option.selected{background:linear-gradient(90deg,rgba(15,143,143,0.08),rgba(46,139,87,0.06));border-color:rgba(15,143,143,0.12)}
+
+  /* submit & results */
+  .actions-row{display:flex;gap:12px;justify-content:flex-end;margin-top:18px}
+  .result-card{background:#fff;padding:16px;border-radius:12px;box-shadow:0 12px 30px rgba(8,18,40,0.04);margin-top:18px}
+
+  /* certificate preview */
+  .certificate-preview{display:flex;gap:12px;align-items:center}
+  .cert-canvas{border-radius:8px;border:1px solid #e6f2ff;box-shadow:0 12px 30px rgba(8,18,40,0.04)}
+
+  /* past results table */
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:10px;text-align:left;border-bottom:1px solid #f1f7ff}
+  th{color:var(--muted);font-weight:700}
+
+  /* responsive */
+  @media(max-width:980px){
+    .wrap{flex-direction:column;padding:18px}
+    nav.sidebar{width:100%;height:auto;position:relative}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap" role="application" aria-label="Student dashboard">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" aria-label="Sidebar">
+    <div class="profile" id="profilePanel">
+      <div class="avatar" id="avatar">SS</div>
+      <div class="pinfo">
+        <h3 id="studentName">Student Name</h3>
+        <p class="small" id="studentEmail">you@example.com</p>
+      </div>
+    </div>
+<!-- <section id="subject-select">
+  <h2>📘 Choose a Subject</h2>
+  <select id="subjectDropdown" class="subject-dropdown">
+    <option value="">-- Select Subject --</option>
+  </select>
+</section> -->
+
+    <div class="side-section">
+      <h4>Available Exams</h4>
+      <div class="exam-list" id="examList">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <div class="side-section">
+      <h4>Announcements</h4>
+      <div id="announcements" class="small">No new announcements</div>
+    </div>
+
+    <div class="side-section">
+      <h4>Quick Actions</h4>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn ghost" id="btnProfileEdit">Edit Profile</button>
+        <button class="btn primary" id="btnLogout">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="content" role="main">
+    <div class="topbar">
+      <div class="welcome">
+        <h2 id="pageTitle">Welcome back — </h2>
+        <div class="small" id="welcomeNote">Ready to take your next exam?</div>
+      </div>
+      <div class="controls" aria-hidden="false">
+        <div class="small" id="serverClock"></div>
+      </div>
+    </div>
+
+    <!-- Exam panel -->
+    <section class="panel" aria-labelledby="examTitle">
+      <div class="exam-meta">
+        <div>
+          <div class="exam-title" id="examTitle">Select an exam</div>
+          <div class="small" id="examDesc">Exam description will appear here</div>
+        </div>
+        <div style="text-align:right">
+          <div class="small">Remaining time</div>
+          <div class="timer" id="timerDisplay">--:--:--</div>
+        </div>
+      </div>
+
+      <div class="progress-wrap" aria-hidden="true">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+
+      <div class="questions" id="questionsContainer" aria-live="polite">
+        <!-- question cards inserted here -->
+        <div class="small" id="noExamNote" style="margin-top:12px">Choose an exam from the left to begin.</div>
+      </div>
+
+     
+
+      <div class="actions-row">
+  <button class="btn ghost" id="btnResetAnswers">Reset Answers</button>
+  <button class="btn primary" id="btnSubmit">Submit Exam</button>
+  <button class="btn ghost" id="btnRetakeExam" style="display: none;">🔁 Retake Exam</button>
+</div>
+
+
+      <!-- Results area -->
+      <div id="resultArea"></div>
+    </section>
+
+    <!-- Past results & certificate -->
+    <section class="panel" aria-labelledby="resultsTitle">
+      <h3 id="resultsTitle">Past Attempts</h3>
+      <div id="pastResultsWrap" style="margin-top:12px">
+        <table id="pastResultsTable" aria-live="polite">
+          <thead><tr><th>Exam</th><th>Score</th><th>Date</th><th>Action</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Instructions -->
+    <section class="panel" aria-labelledby="instrTitle">
+      <h3 id="instrTitle">Exam Instructions</h3>
+      <ul style="margin-top:8px;color:var(--muted)">
+        <li>Ensure a stable internet connection.</li>
+        <li>Webcam access may be required for proctoring (if enabled).</li>
+        <li>Do not refresh your browser during an active exam.</li>
+        <li>All answers auto-save locally as you select options.</li>
+      </ul>
+    </section>
+
+  </main>
+</div>
+
+<!-- Certificate modal (simple) -->
+<div id="certModal" style="display:none;position:fixed;inset:0;align-items:center;justify-content:center;background:rgba(2,6,23,0.6);z-index:9999">
+  <div style="background:#fff;padding:18px;border-radius:12px;max-width:720px;width:92%;box-shadow:0 24px 60px rgba(2,6,23,0.6)">
+    <h3>Certificate Preview</h3>
+    <div style="display:flex;gap:12px;align-items:center">
+      <canvas id="certCanvas" width="800" height="560" class="cert-canvas"></canvas>
+      <div style="flex:1">
+        <p class="small" id="certMeta"></p>
+        <div style="display:flex;gap:8px">
+          <button class="btn primary" id="downloadCert">Download PNG</button>
+          <button class="btn ghost" id="closeCert">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===============================
+   Student Dashboard — JS Logic
+   - exam loading (localStorage -> fallback JSON)
+   - exam select, shuffle per student, persist order in localStorage
+   - render questions (one-page)
+   - autosave user answers in localStorage (per exam + user)
+   - timer with duration from exams[] or default 60
+   - submit -> grade -> save to localStorage.examResults
+   - certificate canvas generation and download
+   - profile & past results
+   =============================== */
+
+const STORAGE = {
+  QUESTIONS: 'questions',       // array of question objects
+  EXAMS: 'exams',               // optional exam objects with metadata {id,examTitle,startDate,durationMinutes}
+  USER: 'loggedInUser',         // {fullname,email,role}
+  ANSWERS_PREFIX: 'answers_',    // + examId + '_' + email
+  ORDER_PREFIX: 'order_',        // store per-exam shuffled order
+  RESULTS: 'examResults',       // array of attempts
+  CONTACTS: 'contactQueue'
+};
+
+// ---------- helper functions ----------
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+function uid() { return 'id' + Math.random().toString(36).slice(2,9); }
+function nowISO(){ return new Date().toISOString(); }
+function formatDate(ts){ const d = new Date(ts); return d.toLocaleString(); }
+
+// ---------- user/profile ----------
+let currentUser = JSON.parse(localStorage.getItem(STORAGE.USER) || 'null');
+if(!currentUser){
+  // if no user found, create a simple dummy student for demo (you can integrate real auth later)
+  currentUser = { fullname: "Student User", email: "student@example.com", role: "student" };
+  localStorage.setItem(STORAGE.USER, JSON.stringify(currentUser));
+}
+$('#studentName').textContent = currentUser.fullname;
+$('#studentEmail').textContent = currentUser.email;
+$('#avatar').textContent = (currentUser.fullname.split(' ').map(x=>x[0]).slice(0,2).join('') || 'ST').toUpperCase();
+$('#pageTitle').textContent = `Welcome back — ${currentUser.fullname.split(' ')[0]}`;
+
+// server clock
+function tickClock(){ $('#serverClock').textContent = new Date().toLocaleString(); }
+tickClock(); setInterval(tickClock, 1000);
+
+// ---------- load questions (localStorage -> fallback JSON) ----------
+async function loadQuestionPool(){
+  const local = JSON.parse(localStorage.getItem(STORAGE.QUESTIONS) || 'null');
+  if(local && Array.isArray(local) && local.length) return local;
+  // try to fetch data/questions.json
+  try{
+    const res = await fetch('../data/questions.json'); // adjust path relative to student/ file
+    if(!res.ok) throw new Error('not found');
+    const json = await res.json();
+    if(Array.isArray(json) && json.length){
+      // store a copy in localStorage for speed
+      localStorage.setItem(STORAGE.QUESTIONS, JSON.stringify(json));
+      return json;
+    }
+  }catch(e){
+    console.warn('questions.json not available or failed to fetch:', e);
+  }
+  // fallback: return empty
+  return [];
+}
+
+// utility: group questions into exams by examTitle or examId if present, else "Default Exam"
+function groupQuestionsByExam(questions){
+  const groups = {};
+  questions.forEach(q => {
+    // support multiple possible keys for exam grouping
+    const key = q.examId || q.exam || q.examTitle || q.category || 'default';
+    const label = (q.examTitle || q.exam || q.category || (key === 'default' ? 'Default Exam' : key));
+    if(!groups[key]) groups[key] = { id: key, title: label, questions: [] };
+    // normalize options array vs separate fields
+    let opts = [];
+    if(Array.isArray(q.options) && q.options.length) opts = q.options;
+    else {
+      // try optionA/B/C/D
+      ['optionA','optionB','optionC','optionD','a','b','c','d'].forEach(k=>{
+        if(q[k]) opts.push(q[k]);
+      });
+    }
+    // detect correct answer value (could be 'A' or text)
+    let correct = q.answer || q.correctAnswer || q.correct || q.answerKey;
+    // normalize numeric index to option text
+    if(typeof correct === 'number' && opts[correct]) correct = opts[correct];
+    // if correct is single letter A,B,C,D -> map to option text
+    if(typeof correct === 'string' && /^[A-D]$/i.test(correct) && opts.length){
+      const idx = {A:0,B:1,C:2,D:3}[correct.toUpperCase()];
+      correct = opts[idx] || correct;
+    }
+    groups[key].questions.push({
+      id: q.id || uid(),
+      question: q.question || q.q || q.prompt || 'Question text missing',
+      options: opts.length ? opts : q.choices || ['Option A','Option B','Option C','Option D'],
+      correctAnswer: correct
+    });
+  });
+  return Object.values(groups);
+}
+
+// ---------- UI: populate exam list ----------
+let examGroups = [];      // array of {id,title,questions}
+let selectedExam = null;  // current exam object from examGroups
+async function initializeDashboard(){
+  const pool = await loadQuestionPool();
+  examGroups = groupQuestionsByExam(pool);
+
+  // if there are also exam metadata objects in localStorage with durations, merge them
+  const examsMeta = JSON.parse(localStorage.getItem(STORAGE.EXAMS) || '[]');
+  if(Array.isArray(examsMeta) && examsMeta.length){
+    examGroups = examGroups.map(g=>{
+      const meta = examsMeta.find(x => String(x.id) === String(g.id) || String(x.examTitle) === String(g.title));
+      return meta ? {...g, ...meta} : g;
+    });
+  }
+
+  // if only one exam group and it's default, ensure title friendly
+  if(examGroups.length === 1 && examGroups[0].title === 'default') examGroups[0].title = 'Practice Exam';
+
+  // populate sidebar list
+  const list = $('#examList'); list.innerHTML = '';
+  if(examGroups.length === 0){
+    list.innerHTML = '<div class="small">No exams available. Contact your admin.</div>';
+  }else{
+    examGroups.forEach((g, idx) => {
+      const div = document.createElement('div');
+      div.className = 'exam-item';
+      div.dataset.idx = idx;
+      div.innerHTML = `<div style="max-width:75%"><strong>${g.title}</strong><div class="small">${g.questions.length} questions</div></div><div class="small">${g.durationMinutes? g.durationMinutes+' min':'60 min'}</div>`;
+      div.addEventListener('click', ()=> selectExam(idx, div));
+      list.appendChild(div);
+    });
+    // auto-select first exam
+    selectExam(0, list.querySelector('.exam-item'));
+  }
+
+  renderPastAttempts();
+}
+initializeDashboard();
+
+// ---------- select exam ----------
+function selectExam(idx, node){
+  // unselect previous
+  $$('#examList .exam-item').forEach(el => el.classList.remove('active'));
+  if(node) node.classList.add('active');
+  selectedExam = JSON.parse(JSON.stringify(examGroups[idx])); // deep copy to avoid mutation
+  // set metadata on UI
+  $('#examTitle').textContent = selectedExam.title || 'Selected Exam';
+  $('#examDesc').textContent = (selectedExam.description || `${selectedExam.questions.length} questions — ${selectedExam.durationMinutes||60} minutes`);
+  // prepare question order and per-student shuffle
+  prepareExamOrder(selectedExam);
+  // render questions
+  renderQuestionsForExam(selectedExam);
+  // reset timer / start countdown
+  startExamTimer(selectedExam);
+}
+
+
+// 🔁 Retake Exam Feature
+document.getElementById('btnRetakeExam').addEventListener('click', () => {
+  if (!selectedExam) {
+    alert('Please select an exam first.');
+    return;
+  }
+  if (!confirm('Are you sure you want to retake this exam? This will erase your previous answers and timer.')) return;
+
+  const answersKey = STORAGE.ANSWERS_PREFIX + selectedExam.id + '_' + currentUser.email;
+  const orderKey = STORAGE.ORDER_PREFIX + selectedExam.id + '_' + currentUser.email;
+  const timerKey = 'timer_' + selectedExam.id + '_' + currentUser.email;
+
+  localStorage.removeItem(answersKey);
+  localStorage.removeItem(orderKey);
+  localStorage.removeItem(timerKey);
+
+  alert('Previous attempt cleared. You can now retake the exam.');
+  location.reload();
+});
+
+
+// ---------- shuffle algorithm (Fisher-Yates) ----------
+function shuffleArray(arr, seed=null){
+  const a = arr.slice();
+  // if no seed, use Math.random
+  if(!seed) {
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]] = [a[j],a[i]];
+    }
+    return a;
+  }
+  // deterministic pseudo-random using seed
+  let s = 0;
+  for(let i=0;i<seed.length;i++) s = (s * 31 + seed.charCodeAt(i)) % 1e9;
+  function rand(){ s = (s * 9301 + 49297) % 233280; return s / 233280; }
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(rand()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+// ---------- prepare per-student order (persisted) ----------
+function prepareExamOrder(exam){
+  const orderKey = STORAGE.ORDER_PREFIX + exam.id + '_' + currentUser.email;
+  const existing = localStorage.getItem(orderKey);
+  if(existing){
+    const data = JSON.parse(existing);
+    exam.shuffledOrder = data.order;
+    exam.optionOrder = data.optionOrder;
+    return;
+  }
+  // create new shuffled question order + per-question option shuffle
+  const qIds = exam.questions.map(q => q.id);
+  // use seed from user email + exam id to produce deterministic shuffle per student
+  const seed = (currentUser.email || '') + '|' + exam.id;
+  const shuffledIds = shuffleArray(qIds, seed);
+  // option order per question
+  const optionOrder = {};
+  for(const qid of shuffledIds){
+    const q = exam.questions.find(x=>x.id===qid);
+    optionOrder[qid] = shuffleArray(q.options.map((o,i)=>i), seed + '|' + qid);
+  }
+  localStorage.setItem(orderKey, JSON.stringify({ order: shuffledIds, optionOrder }));
+  exam.shuffledOrder = shuffledIds;
+  exam.optionOrder = optionOrder;
+}
+
+// ---------- render questions (one page) ----------
+function renderQuestionsForExam(exam){
+  const container = $('#questionsContainer'); container.innerHTML = '';
+  $('#noExamNote').style.display = 'none';
+  // load saved answers (if any)
+  const answersKey = STORAGE.ANSWERS_PREFIX + exam.id + '_' + currentUser.email;
+  let savedAnswers = JSON.parse(localStorage.getItem(answersKey) || '{}');
+
+  // ensure we render in exam.shuffledOrder
+  const qOrder = exam.shuffledOrder || exam.questions.map(q=>q.id);
+  let index = 0;
+  for(const qid of qOrder){
+    const q = exam.questions.find(x=>x.id===qid);
+    index++;
+    const card = document.createElement('div'); card.className = 'qcard';
+    card.id = 'q_' + q.id;
+    // question header
+    const header = document.createElement('div'); header.className = 'qhead';
+    const qnum = document.createElement('div'); qnum.className='small'; qnum.textContent = `Q${index} of ${qOrder.length}`;
+    const qmark = document.createElement('div'); qmark.className='small'; qmark.textContent = ''; // placeholder for future icons
+    header.appendChild(qnum); header.appendChild(qmark);
+
+    // body
+    const qtext = document.createElement('div'); qtext.className = 'qtext'; qtext.textContent = q.question;
+    const optsWrap = document.createElement('div'); optsWrap.className = 'options';
+
+    // option order mapping
+    const optIdxs = (exam.optionOrder && exam.optionOrder[q.id]) ? exam.optionOrder[q.id] : q.options.map((_,i)=>i);
+    for(const oi of optIdxs){
+      const optText = q.options[oi];
+      const optDiv = document.createElement('label'); optDiv.className = 'option';
+      optDiv.tabIndex = 0;
+      const radio = document.createElement('input'); radio.type = 'radio'; radio.name = 'opt_' + q.id; radio.value = optText;
+      if(savedAnswers[q.id] && String(savedAnswers[q.id]) === String(optText)) radio.checked = true;
+      optDiv.appendChild(radio);
+      const span = document.createElement('div'); span.textContent = optText; span.style.marginLeft = '6px';
+      optDiv.appendChild(span);
+      // click handler
+      optDiv.addEventListener('click', (e)=>{
+        e.preventDefault();
+        // set value
+        savedAnswers[q.id] = optText;
+        localStorage.setItem(answersKey, JSON.stringify(savedAnswers));
+        // mark selected
+        optDiv.parentElement.querySelectorAll('.option').forEach(el=>el.classList.remove('selected'));
+        optDiv.classList.add('selected');
+        // update progress
+        updateProgress(exam);
+      });
+      optsWrap.appendChild(optDiv);
+      // set preselected class
+      if(savedAnswers[q.id] && String(savedAnswers[q.id]) === String(optText)) optDiv.classList.add('selected');
+    }
+
+    card.appendChild(header);
+    card.appendChild(qtext);
+    card.appendChild(optsWrap);
+
+    container.appendChild(card);
+  }
+
+  // update progress on render
+  updateProgress(exam);
+}
+
+// ---------- update progress bar ----------
+function updateProgress(exam){
+  const answersKey = STORAGE.ANSWERS_PREFIX + exam.id + '_' + currentUser.email;
+  const savedAnswers = JSON.parse(localStorage.getItem(answersKey) || '{}');
+  const total = exam.questions.length;
+  const answered = Object.keys(savedAnswers).length;
+  const pct = Math.round((answered / total) * 100);
+  $('#progressBar').style.width = pct + '%';
+}
+
+// ---------- autosave note: answers are saved on selection (see above) ----------
+
+// ---------- timer management ----------
+let timerInterval = null;
+function startExamTimer(exam){
+  // stop previous
+  if(timerInterval){ clearInterval(timerInterval); timerInterval = null; }
+  // duration in minutes
+  const durMin = Number(exam.durationMinutes || 60);
+  // timer storage key per exam+user
+  const timerKey = 'timer_' + exam.id + '_' + currentUser.email;
+  let expire = localStorage.getItem(timerKey);
+  if(!expire){
+    // set future expiration time (now + durMin)
+    expire = Date.now() + durMin * 60 * 1000;
+    localStorage.setItem(timerKey, String(expire));
+  } else expire = Number(expire);
+  // update display every second
+  function tick(){
+    const rem = expire - Date.now();
+    if(rem <= 0){
+      $('#timerDisplay').textContent = '00:00:00';
+      clearInterval(timerInterval);
+      timerInterval = null;
+      // auto-submit when time is up
+      autoSubmitOnTimeout(exam);
+      return;
+    }
+    const hrs = Math.floor(rem / (1000*60*60));
+    const mins = Math.floor((rem / (1000*60)) % 60);
+    const secs = Math.floor((rem / 1000) % 60);
+    $('#timerDisplay').textContent = `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+  }
+  tick();
+  timerInterval = setInterval(tick, 1000);
+}
+
+// if time runs out, auto-submit
+function autoSubmitOnTimeout(exam){
+  // show dialog then submit
+  alert('Time is up — your answers will be submitted automatically.');
+  handleSubmitExam(exam, true);
+}
+
+// ---------- submit & grade ----------
+$('#btnSubmit').addEventListener('click', ()=> {
+  if(!selectedExam) { alert('Select an exam first'); return; }
+  if(!confirm('Submit exam now? You will not be able to change answers after submission.')) return;
+  handleSubmitExam(selectedExam, false);
+});
+
+$('#btnResetAnswers').addEventListener('click', ()=> {
+  if(!selectedExam) return;
+  if(!confirm('Reset all your answers for this exam?')) return;
+  const answersKey = STORAGE.ANSWERS_PREFIX + selectedExam.id + '_' + currentUser.email;
+  localStorage.removeItem(answersKey);
+  // also remove progress bar visually and re-render
+  renderQuestionsForExam(selectedExam);
+});
+
+function handleSubmitExam(exam, auto=false){
+  const answersKey = STORAGE.ANSWERS_PREFIX + exam.id + '_' + currentUser.email;
+  const savedAnswers = JSON.parse(localStorage.getItem(answersKey) || '{}');
+  // grade
+  let correct = 0;
+  const breakdown = [];
+  for(const q of exam.questions){
+    const userAns = savedAnswers[q.id] || null;
+    // note: q.correctAnswer may be text; compare lowercase trimmed
+    const ok = userAns && q.correctAnswer && (String(userAns).trim().toLowerCase() === String(q.correctAnswer).trim().toLowerCase());
+    if(ok) correct++;
+    breakdown.push({ questionId: q.id, userAns, correct: !!ok, correctAnswer: q.correctAnswer });
+  }
+  const total = exam.questions.length;
+  const score = Math.round((correct / total) * 100);
+  const attempt = {
+    id: uid(),
+    examId: exam.id,
+    examTitle: exam.title,
+    email: currentUser.email,
+    fullname: currentUser.fullname,
+    score,
+    correct, total,
+    breakdown,
+    date: nowISO(),
+    autoSubmitted: !!auto
+  };
+  // save to results
+  const results = JSON.parse(localStorage.getItem(STORAGE.RESULTS) || '[]');
+  results.push(attempt);
+  localStorage.setItem(STORAGE.RESULTS, JSON.stringify(results));
+  // clear timer record
+  const timerKey = 'timer_' + exam.id + '_' + currentUser.email;
+  localStorage.removeItem(timerKey);
+  if(timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+
+  // show result UI
+  showResult(attempt);
+  renderPastAttempts();
+}
+
+// ---------- display result -->
+function showResult(attempt) {
+  const area = $('#resultArea');
+  area.innerHTML = '';
+
+  const card = document.createElement('div');
+  card.className = 'result-card';
+  card.innerHTML = `
+    <h3>Results — ${attempt.examTitle}</h3>
+    <p class="small">Score: <strong>${attempt.score}%</strong> — ${attempt.correct} of ${attempt.total} correct</p>
+    <p class="small">Date: ${formatDate(attempt.date)}</p>
+    <p class="small">Attempts: ${countAttemptsForExam(attempt.examId)} time(s)</p>
+    <div style="margin-top:12px;display:flex;gap:12px;align-items:center">
+      <button class="btn primary" id="btnPreviewCert">Preview Certificate</button>
+      <button class="btn ghost" id="btnReviewAnswers">Review Answers</button>
+    </div>
+  `;
+  area.appendChild(card);
+
+  // ✅ Show Retake button now
+  $('#btnRetakeExam').style.display = 'inline-block';
+
+  // Listeners
+  $('#btnPreviewCert').addEventListener('click', () => openCertificate(attempt));
+  $('#btnReviewAnswers').addEventListener('click', () => reviewAnswers(attempt));
+}
+
+
+// ---------- review answers (show correct/wrong highlights) ----------
+function reviewAnswers(attempt){
+  // render questions and mark correct/wrong
+  const container = $('#questionsContainer'); container.innerHTML = '';
+  const exam = examGroups.find(e => String(e.id) === String(attempt.examId)) || selectedExam;
+  const qOrder = (localStorage.getItem(STORAGE.ORDER_PREFIX + exam.id + '_' + currentUser.email) ? JSON.parse(localStorage.getItem(STORAGE.ORDER_PREFIX + exam.id + '_' + currentUser.email)).order : exam.questions.map(q=>q.id));
+  for(const qid of qOrder){
+    const q = exam.questions.find(x=>x.id===qid);
+    const entry = attempt.breakdown.find(b=>b.questionId === qid) || {};
+    const card = document.createElement('div'); card.className = 'qcard';
+    const header = document.createElement('div'); header.className = 'qhead';
+    header.innerHTML = `<div class="small">Question</div><div class="small">${entry.correct ? 'Correct' : 'Incorrect'}</div>`;
+    card.appendChild(header);
+    const qtext = document.createElement('div'); qtext.className = 'qtext'; qtext.textContent = q.question; card.appendChild(qtext);
+    const opts = document.createElement('div'); opts.className = 'options';
+    q.options.forEach(opt=>{
+      const o = document.createElement('div'); o.className = 'option'; o.textContent = opt;
+      if(String(opt).trim().toLowerCase() === String(entry.correctAnswer).trim().toLowerCase()){
+        o.style.borderColor = 'rgba(46,139,87,0.18)'; o.style.background = 'linear-gradient(90deg, rgba(46,139,87,0.06), rgba(46,139,87,0.02))';
+      }
+      if(entry.userAns && String(opt).trim().toLowerCase() === String(entry.userAns).trim().toLowerCase()){
+        o.style.boxShadow = '0 8px 20px rgba(11,61,145,0.04)';
+        o.style.border = '1px solid rgba(11,61,145,0.08)';
+      }
+      opts.appendChild(o);
+    });
+    card.appendChild(opts);
+    container.appendChild(card);
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ---------- past attempts rendering ----------
+function renderPastAttempts(){
+  const tb = $('#pastResultsTable tbody'); tb.innerHTML = '';
+  const results = JSON.parse(localStorage.getItem(STORAGE.RESULTS) || '[]').filter(r=> r.email === currentUser.email).reverse();
+  if(!results.length){ tb.innerHTML = '<tr><td colspan="4" class="small">No attempts yet</td></tr>'; return; }
+  results.forEach(r=>{
+    const tr = document.createElement('tr');
+    const d = formatDate(r.date);
+    tr.innerHTML = `<td>${r.examTitle}</td><td>${r.score}%</td><td>${d}</td><td><button class="btn ghost" data-id="${r.id}">View</button> <button class="btn primary" data-cert="${r.id}">Certificate</button></td>`;
+    tb.appendChild(tr);
+  });
+  // view / cert handlers
+  $$('#pastResultsTable button').forEach(b=>{
+    b.addEventListener('click', (e)=>{
+      const id = e.currentTarget.dataset.id;
+      const certId = e.currentTarget.dataset.cert;
+      if(id){
+        const attempt = JSON.parse(localStorage.getItem(STORAGE.RESULTS) || '[]').find(x=>x.id === id);
+        if(attempt) {
+          showResult(attempt);
+          window.scrollTo({top:0,behavior:'smooth'});
+        }
+      } else if(certId){
+        const attempt = JSON.parse(localStorage.getItem(STORAGE.RESULTS) || '[]').find(x=>x.id === certId);
+        if(attempt) openCertificate(attempt);
+      }
+    });
+  });
+}
+
+// ---------- certificate generation (canvas) ----------
+function openCertificate(attempt){
+  const modal = $('#certModal'); modal.style.display = 'flex';
+  const canvas = $('#certCanvas'); const ctx = canvas.getContext('2d');
+  // render certificate visually
+  const W = canvas.width, H = canvas.height;
+  // background
+  ctx.fillStyle = '#fff'; ctx.fillRect(0,0,W,H);
+  // decorative strip
+  ctx.fillStyle = '#082a66'; ctx.fillRect(0,0,W,80);
+  // title
+  ctx.fillStyle = '#082a66'; ctx.font = '700 32px Inter'; ctx.fillText('Certificate of Completion', 60, 140);
+  // student name
+  ctx.font = '800 28px Inter'; ctx.fillStyle = '#0b3d91'; ctx.fillText(attempt.fullname || currentUser.fullname, 60, 200);
+  // exam title
+  ctx.font = '600 18px Inter'; ctx.fillStyle = '#556170'; ctx.fillText(`For successfully completing: ${attempt.examTitle}`, 60, 240);
+  // score & date
+  ctx.fillStyle = '#0b3d91'; ctx.font = '700 18px Inter'; ctx.fillText(`Score: ${attempt.score}%`, 60, 290);
+  ctx.fillStyle = '#556170'; ctx.font = '500 14px Inter'; ctx.fillText(`Date: ${formatDate(attempt.date)}`, 60, 320);
+  // signature block
+  ctx.fillStyle = '#0b3d91'; ctx.font = '700 16px Inter'; ctx.fillText('MedEx Administrator', W - 300, H - 120);
+  ctx.strokeStyle = '#e6f2ff'; ctx.lineWidth = 2; ctx.strokeRect(40,360,W-80,2);
+  // small logo
+  ctx.fillStyle = '#0ea79b'; ctx.fillRect(W - 160, 16, 120, 48);
+  ctx.fillStyle = '#fff'; ctx.font = '700 18px Inter'; ctx.fillText('MedEx', W - 140, 48);
+
+  $('#certMeta').textContent = `${attempt.fullname} — ${attempt.score}% — ${formatDate(attempt.date)}`;
+  // download handler
+  $('#downloadCert').onclick = () => {
+    const url = canvas.toDataURL('image/png');
+    const a = document.createElement('a'); a.href = url; a.download = `MedEx_Certificate_${attempt.examTitle.replace(/\s+/g,'_')}_${attempt.fullname.replace(/\s+/g,'_')}.png`; document.body.appendChild(a); a.click(); a.remove();
+  };
+}
+
+// close cert
+$('#closeCert').addEventListener('click', ()=> $('#certModal').style.display = 'none');
+
+// ---------- init: load questions & build UI ----------
+(async function init(){
+  await initializeDashboard();
+})();
+
+// 📘 Step 1: Define available subjects (you can add more easily later)
+const availableSubjects = [
+  { name: "Anatomy 101", file: "../data/anatomy.json" },
+  { name: "Physiology", file: "../data/physiology.json" },
+  { name: "Pathology", file: "../data/pathology.json" }
+];
+
+// 📥 Step 2: Populate subject dropdown
+window.addEventListener("DOMContentLoaded", () => {
+  const dropdown = document.getElementById("subjectDropdown");
+  availableSubjects.forEach(subject => {
+    const opt = document.createElement("option");
+    opt.value = subject.file;
+    opt.textContent = subject.name;
+    dropdown.appendChild(opt);
+  });
+});
+
+// 📘 Step 3: Load selected subject dynamically
+document.getElementById("subjectDropdown").addEventListener("change", (e) => {
+  const selectedFile = e.target.value;
+  if (!selectedFile) return;
+
+  fetch(selectedFile)
+    .then(res => res.json())
+    .then(data => {
+      localStorage.setItem("all_questions", JSON.stringify(data));
+      alert(`✅ ${data.length} questions loaded from ${e.target.options[e.target.selectedIndex].text}`);
+      renderQuestions(data); // ⬅️ Call your existing question rendering function
+    })
+    .catch(err => {
+      console.error("❌ Failed to load subject:", err);
+      alert("⚠️ Could not load questions for this subject.");
+    });
+});
+
+
+// 🧠 Count attempts for a specific exam
+function countAttemptsForExam(examId) {
+  const results = JSON.parse(localStorage.getItem(STORAGE.RESULTS) || '[]');
+  return results.filter(r => r.examId === examId && r.email === currentUser.email).length;
+}
+// 🚪 Logout logic
+document.getElementById("btnLogout").addEventListener("click", () => {
+  if (confirm("Are you sure you want to log out?")) {
+    // ✅ Clear login/session data
+    localStorage.removeItem("currentUser"); // <-- make sure this key matches what you used at login
+
+    // ✅ Optional: clear other exam-related data
+    localStorage.removeItem("answers_");
+    localStorage.removeItem("all_questions");
+
+    // ✅ Redirect to login page
+    window.location.href = "./pages/login.html"; // change this path to your actual login page
+  }
+});
+
+
+// 🔄 Retake Exam Logic (smart version)
+document.getElementById('btnRetakeExam').addEventListener('click', () => {
+  if (!selectedExam) {
+    alert('Please select an exam first.');
+    return;
+  }
+
+  const confirmMsg = `You have taken this exam ${countAttemptsForExam(selectedExam.id)} time(s).\nDo you want to clear your previous attempt and retake it?`;
+  if (!confirm(confirmMsg)) return;
+
+  const answersKey = STORAGE.ANSWERS_PREFIX + selectedExam.id + '_' + currentUser.email;
+  const orderKey = STORAGE.ORDER_PREFIX + selectedExam.id + '_' + currentUser.email;
+  const timerKey = 'timer_' + selectedExam.id + '_' + currentUser.email;
+
+  // 🧹 Clear old attempt data
+  localStorage.removeItem(answersKey);
+  localStorage.removeItem(orderKey);
+  localStorage.removeItem(timerKey);
+
+  // 🧠 Reset UI
+  $('#resultArea').innerHTML = '';
+  $('#btnRetakeExam').style.display = 'none';
+
+  alert('✅ Previous attempt cleared. You can now retake the exam.');
+  location.reload();
+});
+
+
+</script>
+</body>
+</html>
